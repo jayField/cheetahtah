@@ -36,14 +36,14 @@
       "",
       "처음에 이렇게 따로 연락할 수 있을까 생각했었는데",
       "최근에 많은 이야기를 나누고",
-      "너에 대해서 알아가고 이해해가는 과정이",
+      "너에 대해서 알아가고 이해하는 과정이",
       "즐겁고 시간가는 줄 모르는거 같아.",
       "",
       "앞으로도 지금처럼",
       "재밌게 놀고 잘 지냈으면 좋겠어",
       "잘 부탁할게!!",
     ].join("\n"),
-    sign: "0321 재현이가",
+    sign: "2026.11.11\n0321 신재현",
   };
   const COLORS = ["빨강", "버건디", "골드", "하늘색", "크림색", "초록", "보라", "코랄", "네이비", "민트", "라벤더", "오렌지"];
   const TIMES = ["오전 7시", "오전 9시", "오전 11시", "점심 12시", "오후 2시", "오후 3시", "오후 5시", "저녁 7시", "저녁 8시", "밤 10시"];
@@ -407,7 +407,7 @@
         }
         ly += 20;
         L.signY = ly;
-        L.letterBottom = ly + 44;
+        L.letterBottom = ly + (f.sign.split("\n").length - 1) * LETTER_LH + 44;
         L.cardBottom = L.letterBottom + P;
         L.H = Math.max(1350, L.cardBottom + 130);
         return L;
@@ -522,7 +522,7 @@
         ctx.fillText(ln, IX + 40, ly);
       });
       ctx.textAlign = "right";
-      ctx.fillText(f.sign, IX + IW - 40, L.signY);
+      f.sign.split("\n").forEach((ln, i) => ctx.fillText(ln, IX + IW - 40, L.signY + i * LETTER_LH));
       ctx.textAlign = "left";
     } else {
       // 상세 운세
