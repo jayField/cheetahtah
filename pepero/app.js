@@ -26,7 +26,8 @@
       "이렇게 특별한 빼빼로를 준비해봤어",
       "",
       "아마 올해 많은 일들이 있었던 너에게",
-      "남은 50일 동안 좋은 일들이 가득했으면 좋겠다는 마음을 담아봤어",
+      "남은 50일 동안 좋은 일들이 가득했으면",
+      "좋겠다는 마음을 담아봤어",
       "",
       "어쩌다 우연히 알게 되었는데",
       "같은 INFJ에 같은 생일",
@@ -38,9 +39,11 @@
       "너에 대해서 알아가고 이해해가는 과정이",
       "즐겁고 시간가는 줄 모르는거 같아.",
       "",
-      "앞으로도 지금처럼 재밌게 놀고 지냈으면 좋겠다",
-      "잘 부탁할게",
+      "앞으로도 지금처럼",
+      "재밌게 놀고 잘 지냈으면 좋겠어",
+      "잘 부탁할게!!",
     ].join("\n"),
+    sign: "0321 재현이가",
   };
   const COLORS = ["빨강", "버건디", "골드", "하늘색", "크림색", "초록", "보라", "코랄", "네이비", "민트", "라벤더", "오렌지"];
   const TIMES = ["오전 7시", "오전 9시", "오전 11시", "점심 12시", "오후 2시", "오후 3시", "오후 5시", "저녁 7시", "저녁 8시", "밤 10시"];
@@ -234,7 +237,7 @@
     $(".step.detail .advice").hidden = sp;
     $(".step.detail .match").hidden = sp;
     $("#letter").hidden = !sp;
-    if (sp) $("#letterText").textContent = detail;
+    if (sp) { $("#letterText").textContent = detail; $("#letterSign").textContent = f.sign; }
     else {
       $("#detailText").textContent = detail;
       $("#advice").textContent = advice;
@@ -402,7 +405,9 @@
           if (!para.trim()) { ly += PARA_GAP; continue; }
           for (const ln of wrap(ctx, para, IW - 80)) { L.letterLines.push([ln, ly]); ly += LETTER_LH; }
         }
-        L.letterBottom = ly - LETTER_LH + 44;
+        ly += 20;
+        L.signY = ly;
+        L.letterBottom = ly + 44;
         L.cardBottom = L.letterBottom + P;
         L.H = Math.max(1350, L.cardBottom + 130);
         return L;
@@ -516,6 +521,9 @@
         ctx.beginPath(); ctx.moveTo(IX + 40, ly + 14); ctx.lineTo(IX + IW - 40, ly + 14); ctx.stroke();
         ctx.fillText(ln, IX + 40, ly);
       });
+      ctx.textAlign = "right";
+      ctx.fillText(f.sign, IX + IW - 40, L.signY);
+      ctx.textAlign = "left";
     } else {
       // 상세 운세
       ctx.fillStyle = INK;

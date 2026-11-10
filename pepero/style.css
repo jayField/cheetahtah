@@ -376,3 +376,4 @@ body.dalbi .lucky dt { color: #6A7A90; }
 .score-badge.inline b { font-size: 23px; }
 .score-badge.inline small { font-size: 12px; padding-top: 5px; }
 body.dalbi .card-title h2 { font-size: 23px; }
+.letter .pen.sign { text-align: right; margin-top: 6px; background: none; }
