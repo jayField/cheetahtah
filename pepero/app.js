@@ -14,6 +14,28 @@
   const TIMES = ["오전 7시", "오전 9시", "오전 11시", "점심 12시", "오후 2시", "오후 3시", "오후 5시", "저녁 7시", "저녁 8시", "밤 10시"];
   const ITEMS = ["손편지", "이어폰", "포스트잇", "텀블러", "동전 지갑", "향수", "머리끈", "볼펜", "우산", "목도리", "핸드크림", "빼빼로"];
   const RANDOM = F.length;
+
+  // 맛별 화면 색: bg 배경, fg 배경 위 글자, hl 종이 카드 위 강조색
+  const THEMES = {
+    default: { bg: "#B5121B", fg: "#FFFFFF", hl: "#B5121B" },
+    love:    { bg: "#D0202E", fg: "#FFFFFF", hl: "#B5121B" },
+    love2:   { bg: "#8ECDF0", fg: "#14324A", hl: "#1F5C86" },
+    money:   { bg: "#2E8B57", fg: "#FFFFFF", hl: "#23704A" },
+    work:    { bg: "#F5821F", fg: "#2A1A0E", hl: "#B0500A" },
+    study:   { bg: "#F7C631", fg: "#2A1A0E", hl: "#8A6100" },
+    luck:    { bg: "#EDE7DC", fg: "#2A1A0E", hl: "#6B4A2E" },
+    yearend: { bg: "#2453A6", fg: "#FFFFFF", hl: "#2453A6" },
+    random:  { bg: "#2A2A2A", fg: "#FFFFFF", hl: "#2A2A2A" },
+  };
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  function setTheme(key) {
+    const t = THEMES[key] || THEMES.default;
+    const root = document.documentElement.style;
+    root.setProperty("--accent", t.bg);
+    root.setProperty("--fg", t.fg);
+    root.setProperty("--hl", t.hl);
+    if (themeMeta) themeMeta.content = t.bg;
+  }
   const STEPS = ["intro", "pick", "draw", "detail"];
 
   const $ = (s) => document.querySelector(s);
@@ -48,6 +70,7 @@
 
   $("#start").addEventListener("click", () => {
     state.sel = null;
+    setTheme("default");
     renderPacks();
     go("pick");
   });
@@ -71,6 +94,7 @@
     const b = e.target.closest(".pack");
     if (!b) return;
     state.sel = +b.dataset.i;
+    setTheme(state.sel === RANDOM ? "random" : F[state.sel].k);
     renderPacks();
   });
 
@@ -87,6 +111,7 @@
     if (state.sel === null) return;
     const pick = state.sel === RANDOM ? r(F.length) : state.sel;
     const f = F[pick];
+    setTheme(f.k);
     const pool = D[f.k];
     const entry = pool.list[r(pool.list.length)];
     state.result = {
@@ -132,6 +157,7 @@
   $("#again").addEventListener("click", () => {
     clearTimeout(pullTimer);
     state.sel = null;
+    setTheme("default");
     renderPacks();
     go("pick");
   });
@@ -152,6 +178,7 @@
 
   $("#home").addEventListener("click", () => {
     state.sel = null;
+    setTheme("default");
     go("intro");
   });
 

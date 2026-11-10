@@ -1,5 +1,9 @@
 :root {
-  --accent: #B5121B;
+  --accent: #B5121B;   /* 배경 */
+  --fg: #FFFFFF;       /* 배경 위 글자 */
+  --hl: #B5121B;       /* 종이 카드 위 강조색 */
+  --gap: clamp(14px, 2.6vh, 22px);
+  --pad: clamp(20px, 3.4vh, 32px);
   --paper: #FFF6EA;
   --ink: #3A1A12;
   --biscuit: linear-gradient(90deg, #CFA261, #EFD29E 50%, #CFA261);
@@ -12,7 +16,8 @@ html, body { margin: 0; }
 
 body {
   background: var(--accent);
-  color: #fff;
+  color: var(--fg);
+  transition: background-color .45s ease, color .45s ease;
   font-family: "Noto Sans KR", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -38,14 +43,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: calc(28px + env(safe-area-inset-top)) 28px 0;
+  padding: calc(var(--pad) + env(safe-area-inset-top)) 28px 0;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 2px;
 }
 .dots { display: flex; gap: 6px; }
-.dots span { width: 6px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.35); transition: width .3s, background .3s; }
-.dots span.on { background: #fff; }
+.dots span { width: 6px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--fg) 35%, transparent); transition: width .3s, background .3s; }
+.dots span.on { background: var(--fg); }
 .dots span.cur { width: 18px; }
 
 /* 공통 단계 레이아웃 */
@@ -53,8 +58,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 28px 28px calc(32px + env(safe-area-inset-bottom));
-  gap: 22px;
+  padding: var(--pad) 28px calc(var(--pad) + env(safe-area-inset-bottom));
+  gap: var(--gap);
   animation: enter .35s ease-out;
 }
 @keyframes enter { from { opacity: 0; transform: translateY(10px); } }
@@ -72,9 +77,9 @@ body {
   transition: transform .15s, background .2s, color .2s;
 }
 .btn:active { transform: scale(.98); }
-.btn.solid { border: 0; background: #fff; color: var(--accent); }
-.btn.solid:disabled { background: rgba(255,255,255,.3); color: #fff; cursor: default; }
-.btn.ghost { border: 2px solid #fff; background: transparent; color: #fff; }
+.btn.solid { border: 0; background: var(--fg); color: var(--accent); transition: transform .15s, background .45s, color .45s; }
+.btn.solid:disabled { background: color-mix(in srgb, var(--fg) 25%, transparent); color: var(--fg); cursor: default; }
+.btn.ghost { border: 2px solid var(--fg); background: transparent; color: var(--fg); }
 .step > .btn { margin-top: auto; }
 .actions { margin-top: auto; display: flex; gap: 10px; }
 .actions .btn { flex: 1; height: 56px; font-size: 15px; }
@@ -142,7 +147,7 @@ body {
   box-shadow: 0 8px 0 -2px rgba(0,0,0,.2);
   transition: box-shadow .2s;
 }
-.pack[aria-pressed="true"] .pack-box { box-shadow: 0 0 0 4px #fff, 0 10px 0 -2px rgba(0,0,0,.25); }
+.pack[aria-pressed="true"] .pack-box { box-shadow: 0 0 0 4px var(--fg), 0 10px 0 -2px rgba(0,0,0,.25); }
 .pack-tips {
   position: absolute;
   right: 10px;
@@ -174,7 +179,7 @@ body {
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  background: rgba(255,255,255,.14);
+  background: color-mix(in srgb, var(--fg) 14%, transparent);
   opacity: 0;
   transition: opacity .6s .6s;
 }
@@ -198,7 +203,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 16px 0 -6px rgba(0,0,0,.25);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fg) 60%, transparent), 0 16px 0 -6px rgba(0,0,0,.25);
 }
 .open-box-lid { position: absolute; inset: 0 0 auto; height: 30px; background: rgba(0,0,0,.3); border-radius: 6px 6px 0 0; }
 .open-box span { font-family: "Black Han Sans", sans-serif; font-size: 24px; margin-top: 20px; }
@@ -214,7 +219,7 @@ body {
   transform: translateY(12px);
   transition: opacity .5s .8s, transform .5s .8s;
 }
-.quick-row { display: flex; justify-content: space-between; align-items: baseline; font-family: "Black Han Sans", sans-serif; color: var(--accent); }
+.quick-row { display: flex; justify-content: space-between; align-items: baseline; font-family: "Black Han Sans", sans-serif; color: var(--hl); }
 .quick-type { font-size: 22px; }
 .quick-score { font-size: 30px; }
 .quick p { margin: 0; font-size: 15px; line-height: 1.65; }
@@ -239,7 +244,7 @@ body {
 .mini-stick { width: 16px; height: 64px; border-radius: 8px 8px 4px 4px; transform: rotate(14deg); }
 .mini-stick .biscuit { height: 22px; }
 .card-title { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.card-title .label { font-size: 12px; color: var(--accent); }
+.card-title .label { font-size: 12px; color: var(--hl); }
 .card-title h2 { margin: 0; font-family: "Black Han Sans", sans-serif; font-weight: 400; font-size: 26px; line-height: 1.2; word-break: keep-all; }
 .score-badge {
   flex-shrink: 0;
@@ -250,7 +255,7 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 32px;
-  background: var(--accent);
+  background: var(--hl);
   color: #fff;
 }
 .score-badge b { font-family: "Black Han Sans", sans-serif; font-weight: 400; font-size: 24px; line-height: 1; }
@@ -261,9 +266,29 @@ body {
 .lucky dt { font-size: 11px; color: #6E5446; }
 .lucky dd { margin: 0; font-size: 15px; font-weight: 700; }
 .advice { border-top: 1px dashed #C9B49A; padding-top: 12px; display: flex; flex-direction: column; gap: 4px; }
-.advice .label { font-size: 12px; color: var(--accent); }
+.advice .label { font-size: 12px; color: var(--hl); }
 .pen { font-family: "Nanum Pen Script", cursive; font-size: 24px; line-height: 1.2; }
 .match { display: flex; justify-content: space-between; align-items: center; font-size: 13px; background: #F3E4CE; border-radius: 10px; padding: 10px 12px; }
+
+/* PC·태블릿: 휴대폰 크기 카드를 화면 가운데에 */
+@media (min-width: 600px) {
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px 16px;
+    background: color-mix(in srgb, var(--accent) 78%, #000);
+  }
+  .app {
+    width: 430px;
+    min-height: min(880px, calc(100vh - 64px));
+    background: var(--accent);
+    border-radius: 36px;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--fg) 12%, transparent);
+    transition: background-color .45s ease;
+  }
+  :root { --gap: clamp(14px, 2.2vh, 22px); --pad: clamp(20px, 3vh, 32px); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
