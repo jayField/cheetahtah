@@ -2,94 +2,110 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>빼빼로데이 선물하기</title>
-  <meta name="description" content="나만의 빼빼로를 꾸미고 마음을 담아 링크로 보내세요." />
-  <meta property="og:title" content="빼빼로가 도착했어요 🍫" />
-  <meta property="og:description" content="누군가 당신을 위해 빼빼로를 만들었어요. 열어보세요!" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#B5121B" />
+  <title>11.11 빼빼로 운세</title>
+  <meta name="description" content="빼빼로 한 개로 보는 오늘의 운. 끌리는 상자를 골라 막대 하나를 뽑아 보세요." />
+  <meta property="og:title" content="11.11 빼빼로 운세" />
+  <meta property="og:description" content="빼빼로 한 개로 보는 오늘의 운. 끌리는 상자를 골라 막대 하나를 뽑아 보세요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="bg-sticks" aria-hidden="true"></div>
-
-  <!-- 만들기 화면 -->
-  <main id="maker" class="view">
-    <header class="hero">
-      <p class="eyebrow">11 · 11</p>
-      <h1>빼빼로데이</h1>
-      <p class="countdown" id="countdown"></p>
+  <div class="app">
+    <header class="top">
+      <span>11.11 빼빼로 운세</span>
+      <div class="dots" id="dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     </header>
 
-    <section class="studio">
-      <div class="preview card">
-        <div class="box" id="previewBox">
-          <div class="sticks" id="previewSticks"></div>
+    <!-- 1. 소개 -->
+    <section class="step intro" data-step="intro">
+      <div class="head">
+        <h1 class="display">빼빼로 한 개로<br />보는 오늘의 운</h1>
+        <p>11월 11일, 상자 속 빼빼로가<br />당신의 남은 올해를 알려 줄 거예요.</p>
+      </div>
+      <div class="intro-stage" aria-hidden="true">
+        <div class="intro-sticks" id="introSticks"></div>
+        <div class="intro-box">
+          <div class="intro-box-lid"></div>
+          <span class="intro-box-title">11 · 11</span>
+          <span class="intro-box-sub">FORTUNE STICK BOX</span>
         </div>
       </div>
+      <ol class="howto">
+        <li><span>01</span>끌리는 빼빼로 상자 고르기</li>
+        <li><span>02</span>상자에서 막대 하나 뽑기</li>
+        <li><span>03</span>맛에 숨은 운세 확인</li>
+      </ol>
+      <button class="btn solid" id="start" type="button">운세 보러 가기</button>
+    </section>
 
-      <form class="controls card" id="form" autocomplete="off">
-        <fieldset>
-          <legend>초콜릿</legend>
-          <div class="chips" data-key="coat"></div>
-        </fieldset>
-        <fieldset>
-          <legend>토핑</legend>
-          <div class="chips" data-key="top"></div>
-        </fieldset>
-        <fieldset>
-          <legend>상자 색</legend>
-          <div class="chips swatches" data-key="box"></div>
-        </fieldset>
-        <fieldset>
-          <legend>개수 <output id="countOut">5</output>개</legend>
-          <input type="range" id="count" min="1" max="11" value="5" />
-        </fieldset>
-        <div class="row">
-          <label>받는 사람<input id="to" maxlength="20" placeholder="예: 민지" /></label>
-          <label>보내는 사람<input id="from" maxlength="20" placeholder="예: 준호" /></label>
+    <!-- 2. 상자 고르기 -->
+    <section class="step pick" data-step="pick" hidden>
+      <div class="head">
+        <h1 class="display sm">끌리는 상자를<br />하나 골라요</h1>
+        <p>맛마다 다른 운세가 들어 있어요.</p>
+      </div>
+      <div class="packs" id="packs"></div>
+      <button class="btn solid" id="draw" type="button" disabled>상자를 먼저 골라 주세요</button>
+    </section>
+
+    <!-- 3. 뽑기 + 간단 결과 -->
+    <section class="step draw" data-step="draw" hidden>
+      <div class="head">
+        <span class="label" id="drawBoxName"></span>
+        <h1 class="display md" id="drawTitle">하나 꺼내는 중…</h1>
+      </div>
+      <div class="draw-stage" aria-hidden="true">
+        <div class="glow"></div>
+        <div class="big-stick stick" id="bigStick"><div class="coat"></div><div class="biscuit"></div></div>
+        <div class="open-box" id="openBox">
+          <div class="open-box-lid"></div>
+          <span id="openBoxName"></span>
         </div>
-        <label>메시지
-          <textarea id="msg" maxlength="200" rows="3" placeholder="올해도 고마워! 길쭉하게 오래오래 함께하자 🍫"></textarea>
-          <span class="counter"><span id="msgLen">0</span>/200</span>
-        </label>
-        <button type="submit" class="btn primary">선물 링크 만들기</button>
-      </form>
+      </div>
+      <div class="quick" id="quick">
+        <div class="quick-row">
+          <span class="quick-type" id="quickType"></span>
+          <span class="quick-score" id="quickScore"></span>
+        </div>
+        <p id="quickLine"></p>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="again" type="button">다시 고르기</button>
+        <button class="btn solid wide" id="toDetail" type="button">자세한 운세 보기</button>
+      </div>
     </section>
 
-    <section class="share card" id="share" hidden>
-      <p>링크가 준비됐어요! 보내주세요 💌</p>
-      <div class="share-row">
-        <input id="link" readonly />
-        <button class="btn" id="copy" type="button">복사</button>
-        <button class="btn" id="native" type="button" hidden>공유</button>
+    <!-- 4. 상세 결과 -->
+    <section class="step detail" data-step="detail" hidden>
+      <article class="card">
+        <div class="card-head">
+          <div class="mini-stick stick" id="miniStick"><div class="coat"></div><div class="biscuit"></div></div>
+          <div class="card-title">
+            <span class="label" id="detailMeta"></span>
+            <h2 id="detailHead"></h2>
+          </div>
+          <div class="score-badge"><b id="detailScore"></b><small>점</small></div>
+        </div>
+        <p class="detail-text" id="detailText"></p>
+        <dl class="lucky" id="lucky"></dl>
+        <div class="advice">
+          <span class="label">오늘 해 볼 한 가지</span>
+          <span class="pen" id="advice"></span>
+        </div>
+        <div class="match"><span>같이 먹으면 좋은 맛</span><b id="match"></b></div>
+      </article>
+      <div class="actions">
+        <button class="btn ghost" id="home" type="button">처음으로</button>
+        <button class="btn solid wide" id="share" type="button">친구에게 빼빼로 보내기</button>
       </div>
-      <a class="peek" id="peek" target="_blank" rel="noopener">받는 화면 미리보기 →</a>
     </section>
+  </div>
 
-    <footer>오늘 하루도 길~게 행복하세요</footer>
-  </main>
-
-  <!-- 받기 화면 -->
-  <main id="receiver" class="view" hidden>
-    <p class="eyebrow" id="rTo"></p>
-    <h1 class="r-title">빼빼로가 도착했어요</h1>
-    <button class="gift" id="gift" type="button" aria-label="선물 열기">
-      <div class="box big" id="giftBox">
-        <div class="lid"><span class="ribbon"></span></div>
-        <div class="sticks" id="giftSticks"></div>
-      </div>
-      <span class="tap">눌러서 열기</span>
-    </button>
-    <article class="letter card" id="letter" hidden>
-      <p class="letter-msg" id="rMsg"></p>
-      <p class="letter-from" id="rFrom"></p>
-    </article>
-    <a class="btn primary" id="makeOwn" href="./" hidden>나도 빼빼로 보내기</a>
-  </main>
-
+  <script src="fortunes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
