@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>빼빼로데이 선물하기</title>
+  <meta name="description" content="나만의 빼빼로를 꾸미고 마음을 담아 링크로 보내세요." />
+  <meta property="og:title" content="빼빼로가 도착했어요 🍫" />
+  <meta property="og:description" content="누군가 당신을 위해 빼빼로를 만들었어요. 열어보세요!" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-sticks" aria-hidden="true"></div>
+
+  <!-- 만들기 화면 -->
+  <main id="maker" class="view">
+    <header class="hero">
+      <p class="eyebrow">11 · 11</p>
+      <h1>빼빼로데이</h1>
+      <p class="countdown" id="countdown"></p>
+    </header>
+
+    <section class="studio">
+      <div class="preview card">
+        <div class="box" id="previewBox">
+          <div class="sticks" id="previewSticks"></div>
+        </div>
+      </div>
+
+      <form class="controls card" id="form" autocomplete="off">
+        <fieldset>
+          <legend>초콜릿</legend>
+          <div class="chips" data-key="coat"></div>
+        </fieldset>
+        <fieldset>
+          <legend>토핑</legend>
+          <div class="chips" data-key="top"></div>
+        </fieldset>
+        <fieldset>
+          <legend>상자 색</legend>
+          <div class="chips swatches" data-key="box"></div>
+        </fieldset>
+        <fieldset>
+          <legend>개수 <output id="countOut">5</output>개</legend>
+          <input type="range" id="count" min="1" max="11" value="5" />
+        </fieldset>
+        <div class="row">
+          <label>받는 사람<input id="to" maxlength="20" placeholder="예: 민지" /></label>
+          <label>보내는 사람<input id="from" maxlength="20" placeholder="예: 준호" /></label>
+        </div>
+        <label>메시지
+          <textarea id="msg" maxlength="200" rows="3" placeholder="올해도 고마워! 길쭉하게 오래오래 함께하자 🍫"></textarea>
+          <span class="counter"><span id="msgLen">0</span>/200</span>
+        </label>
+        <button type="submit" class="btn primary">선물 링크 만들기</button>
+      </form>
+    </section>
+
+    <section class="share card" id="share" hidden>
+      <p>링크가 준비됐어요! 보내주세요 💌</p>
+      <div class="share-row">
+        <input id="link" readonly />
+        <button class="btn" id="copy" type="button">복사</button>
+        <button class="btn" id="native" type="button" hidden>공유</button>
+      </div>
+      <a class="peek" id="peek" target="_blank" rel="noopener">받는 화면 미리보기 →</a>
+    </section>
+
+    <footer>오늘 하루도 길~게 행복하세요</footer>
+  </main>
+
+  <!-- 받기 화면 -->
+  <main id="receiver" class="view" hidden>
+    <p class="eyebrow" id="rTo"></p>
+    <h1 class="r-title">빼빼로가 도착했어요</h1>
+    <button class="gift" id="gift" type="button" aria-label="선물 열기">
+      <div class="box big" id="giftBox">
+        <div class="lid"><span class="ribbon"></span></div>
+        <div class="sticks" id="giftSticks"></div>
+      </div>
+      <span class="tap">눌러서 열기</span>
+    </button>
+    <article class="letter card" id="letter" hidden>
+      <p class="letter-msg" id="rMsg"></p>
+      <p class="letter-from" id="rFrom"></p>
+    </article>
+    <a class="btn primary" id="makeOwn" href="./" hidden>나도 빼빼로 보내기</a>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
