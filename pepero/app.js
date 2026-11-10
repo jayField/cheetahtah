@@ -126,7 +126,9 @@
         <span class="pack-type">${DALBI.t}</span>
       </div>
     </button>`;
-  $("#packs").innerHTML = dalbiPack + packList.map(
+  // 달비 상자는 숨김: 주소 끝에 #dalbi 를 붙여 들어올 때만 보임
+  const showDalbi = location.hash === "#dalbi";
+  $("#packs").innerHTML = (showDalbi ? dalbiPack : "") + packList.map(
     (p, i) => `<button type="button" class="pack" data-i="${i}" aria-pressed="false">
       <div class="pack-box" style="background:${p.box};color:${p.fg}">
         <div class="pack-tips"><i style="background:${p.tip}"></i><i style="background:${p.tip}"></i><i style="background:${p.tip}"></i></div>
