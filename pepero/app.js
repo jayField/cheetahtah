@@ -161,12 +161,7 @@
         score: 100,
         head: DALBI.head,
         detail: DALBI.letter,
-        lucky: [
-          ["행운의 색", "하늘색"],
-          ["행운의 숫자", "50"],
-          ["행운의 시간", TIMES[r(TIMES.length)]],
-          ["행운의 물건", "빼빼로"],
-        ],
+        lucky: [],
       };
       renderDraw();
       return;
@@ -233,6 +228,8 @@
     else $("#detailHead").textContent = head;
     $("#detailScore").textContent = score;
     const sp = !!f.special;
+    $(".step.detail .score-badge").classList.toggle("inline", sp);
+    $("#lucky").hidden = sp;
     $("#detailText").hidden = sp;
     $(".step.detail .advice").hidden = sp;
     $(".step.detail .match").hidden = sp;
@@ -335,6 +332,15 @@
     ctx.restore();
   }
 
+  function loadImage(src) {
+    return new Promise((res) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = () => res(null);
+      im.src = src;
+    });
+  }
+
   async function renderResultImage() {
     const { f, score, head, detail, advice, match, lucky } = state.result;
     const t = THEMES[f.k] || THEMES.default;
@@ -397,10 +403,7 @@
           for (const ln of wrap(ctx, para, IW - 80)) { L.letterLines.push([ln, ly]); ly += LETTER_LH; }
         }
         L.letterBottom = ly - LETTER_LH + 44;
-        y = L.letterBottom + 40;
-        L.gridY = y;
-        y += 110 * 2 + 20;
-        L.cardBottom = y + P;
+        L.cardBottom = L.letterBottom + P;
         L.H = Math.max(1350, L.cardBottom + 130);
         return L;
       }
@@ -463,17 +466,45 @@
     ctx.fillStyle = t.hl;
     ctx.beginPath(); ctx.arc(scx, scy, 80, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#FFFFFF";
-    ctx.textAlign = "center";
-    ctx.font = `64px ${DISPLAY}`;
-    ctx.fillText(String(score), scx, scy + 14);
-    ctx.font = `700 24px ${SANS}`;
-    ctx.fillText("점", scx, scy + 50);
+    if (sp) {
+      // "100점" 한 줄로
+      ctx.font = `56px ${DISPLAY}`;
+      const nw = ctx.measureText(String(score)).width;
+      ctx.font = `700 30px ${SANS}`;
+      const uw = ctx.measureText("점").width;
+      const sx = scx - (nw + 4 + uw) / 2;
+      ctx.textAlign = "left";
+      ctx.font = `56px ${DISPLAY}`;
+      ctx.fillText(String(score), sx, scy + 20);
+      ctx.font = `700 30px ${SANS}`;
+      ctx.fillText("점", sx + nw + 4, scy + 20);
+    } else {
+      ctx.textAlign = "center";
+      ctx.font = `64px ${DISPLAY}`;
+      ctx.fillText(String(score), scx, scy + 14);
+      ctx.font = `700 24px ${SANS}`;
+      ctx.fillText("점", scx, scy + 50);
+    }
 
     ctx.textAlign = "left";
     if (sp) {
       // 편지 상자 (버터색 + 분홍 줄)
+      const bh = L.letterBottom - L.letterTop;
+      ctx.save();
+      roundRect(ctx, IX, L.letterTop, IW, bh, 32);
+      ctx.clip();
       ctx.fillStyle = "#FFF7D9";
-      roundRect(ctx, IX, L.letterTop, IW, L.letterBottom - L.letterTop, 32); ctx.fill();
+      ctx.fillRect(IX, L.letterTop, IW, bh);
+      const img = await loadImage("dalbi-bg.jpg");
+      if (img) {
+        // 상자를 꽉 채우도록 잘라서 흐리게
+        const sc = Math.max(IW / img.width, bh / img.height);
+        const dw = img.width * sc, dh = img.height * sc;
+        ctx.globalAlpha = 0.3;
+        ctx.drawImage(img, IX + (IW - dw) / 2, L.letterTop + (bh - dh) / 2, dw, dh);
+        ctx.globalAlpha = 1;
+      }
+      ctx.restore();
       ctx.fillStyle = t.hl;
       ctx.font = `700 28px ${SANS}`;
       ctx.fillText("빼빼로에 담은 편지 💌", IX + 40, L.letterLabelY);

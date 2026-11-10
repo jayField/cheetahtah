@@ -348,7 +348,7 @@ body.dalbi .lucky div { background: #EEF7FD; border-color: #CFE6F5; }
 body.dalbi .lucky dt { color: #6A7A90; }
 
 .letter {
-  background: #FFF7D9;
+  background: linear-gradient(rgba(255,247,217,.7), rgba(255,247,217,.7)), url("dalbi-bg.jpg") center / cover, #FFF7D9;
   border-radius: 16px;
   padding: 14px 14px 16px;
   margin: 0 -4px;
@@ -371,3 +371,8 @@ body.dalbi .lucky dt { color: #6A7A90; }
   body.dalbi { background: linear-gradient(165deg, #9FCDEB, #E6C3D0 70%, #E9D59A) fixed; }
   body.dalbi .app { background: linear-gradient(165deg, #C4E6FA 0%, #F4FAFF 42%, #FFDCE6 72%, #FFEFB3 100%); }
 }
+
+.score-badge.inline { width: 70px; height: 70px; border-radius: 35px; flex-direction: row; align-items: center; gap: 1px; }
+.score-badge.inline b { font-size: 23px; }
+.score-badge.inline small { font-size: 12px; padding-top: 5px; }
+body.dalbi .card-title h2 { font-size: 23px; }
