@@ -188,7 +188,7 @@
     const { f, head } = state.result;
     const text = `내 빼빼로 운세는 ${f.n} · ${f.t}! "${head}" 너도 하나 뽑아 봐 🍫`;
     if (navigator.share) {
-      try { await navigator.share({ title: "11.11 빼빼로 운세", text, url }); } catch {}
+      try { await navigator.share({ title: "2026 빼빼로 운세", text, url }); } catch {}
       return;
     }
     try {
