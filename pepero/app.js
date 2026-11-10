@@ -200,5 +200,254 @@
     setTimeout(() => (btn.textContent = "친구에게 빼빼로 보내기"), 1800);
   });
 
+  // ---------- 결과 이미지 저장 ----------
+  const SANS = '"Noto Sans KR", sans-serif';
+  const DISPLAY = '"Black Han Sans", sans-serif';
+  const PEN = '"Nanum Pen Script", cursive';
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h);
+  }
+
+  // 한글은 글자 단위, 가능하면 띄어쓰기 단위로 줄바꿈
+  function wrap(ctx, text, maxW) {
+    const lines = [];
+    let line = "";
+    for (const word of text.split(" ")) {
+      const test = line ? line + " " + word : word;
+      if (ctx.measureText(test).width <= maxW) { line = test; continue; }
+      if (line) lines.push(line);
+      if (ctx.measureText(word).width <= maxW) { line = word; continue; }
+      line = "";
+      for (const ch of word) {
+        if (ctx.measureText(line + ch).width > maxW) { lines.push(line); line = ch; } else line += ch;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawStick(ctx, f, x, y, w, h) {
+    const bis = h * 0.36;
+    ctx.save();
+    ctx.translate(x + w / 2, y + h / 2);
+    ctx.rotate((14 * Math.PI) / 180);
+    ctx.translate(-w / 2, -h / 2);
+    roundRect(ctx, 0, 0, w, h, [w / 2, w / 2, 6, 6]);
+    ctx.clip();
+    const bg = ctx.createLinearGradient(0, 0, w, 0);
+    bg.addColorStop(0, "#CFA261"); bg.addColorStop(0.5, "#EFD29E"); bg.addColorStop(1, "#CFA261");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+    const ch = h - bis;
+    if (f.core) {
+      ctx.fillStyle = "#5B2E1C";
+      ctx.fillRect(w * 0.28, 0, w * 0.44, ch);
+    } else {
+      const g = ctx.createLinearGradient(0, 0, w, 0);
+      g.addColorStop(0, f.c); g.addColorStop(0.45, f.hi); g.addColorStop(0.7, f.c); g.addColorStop(1, f.c);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, ch);
+      if (f.dots || f.specks) {
+        ctx.fillStyle = f.dots || "#3B2418";
+        const step = f.dots ? 11 : 8, rad = f.dots ? 2.6 : 1.8;
+        for (let yy = 6; yy < ch - 4; yy += step) {
+          for (let xx = (yy / step) % 2 ? 5 : 10; xx < w; xx += step) {
+            ctx.beginPath(); ctx.arc(xx, yy, rad, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  async function renderResultImage() {
+    const { f, score, head, detail, advice, match, lucky } = state.result;
+    const t = THEMES[f.k] || THEMES.default;
+    const sample = head + detail + advice + match + lucky.flat().join("") + "2026빼빼로운세같이먹으면좋은맛오늘해볼한가지점·cheetahtah.com/pepero";
+    await Promise.all([
+      document.fonts.load(`64px ${DISPLAY}`, sample),
+      document.fonts.load(`400 36px ${SANS}`, sample),
+      document.fonts.load(`700 36px ${SANS}`, sample),
+      document.fonts.load(`58px ${PEN}`, advice),
+    ]).catch(() => {});
+
+    const W = 1080, CX = 60, CW = W - CX * 2, P = 64, IX = CX + P, IW = CW - P * 2;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = W;
+    canvas.height = 2000; // 측정용, 아래에서 실제 높이로 다시 그림
+
+    // 1차: 레이아웃 계산
+    const layout = () => {
+      const L = {};
+      let y = 170 + P; // 카드 안쪽 시작
+      L.headTop = y;
+      // 제목이 한 줄에 안 들어가면 글자를 줄이고, 그래도 길면 두 줄로
+      L.headSize = 64;
+      ctx.font = `${L.headSize}px ${DISPLAY}`;
+      if (ctx.measureText(head).width > IW - 110 - 190) {
+        L.headSize = 54;
+        ctx.font = `${L.headSize}px ${DISPLAY}`;
+      }
+      L.headLH = Math.round(L.headSize * 1.22);
+      L.headLines = wrap(ctx, head, IW - 110 - 190);
+      if (L.headLines.length === 2) {
+        // 두 줄이면 띄어쓰기 기준으로 길이를 비슷하게 나눔 (한 글자만 남는 줄 방지)
+        const words = head.split(" ");
+        let best = null;
+        for (let i = 1; i < words.length; i++) {
+          const l1 = words.slice(0, i).join(" "), l2 = words.slice(i).join(" ");
+          const m = Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width);
+          if (m <= IW - 110 - 190 && (!best || m < best.m)) best = { m, lines: [l1, l2] };
+        }
+        if (best) L.headLines = best.lines;
+      }
+      L.headY = y + 76;
+      const headBottom = L.headY + 26 + (L.headLines.length - 1) * L.headLH + 18;
+      y = Math.max(y + 190, headBottom + 44);
+      ctx.font = `400 36px ${SANS}`;
+      L.detailLines = wrap(ctx, detail, IW);
+      L.detailY = y + 36;
+      y = L.detailY + (L.detailLines.length - 1) * 62 + 56;
+      L.gridY = y;
+      y += 110 * 2 + 20 + 48;
+      L.dashY = y;
+      L.adviceLabelY = y + 56;
+      L.adviceY = y + 128;
+      y += 170;
+      L.matchY = y;
+      y += 88;
+      L.cardBottom = y + P;
+      L.H = Math.max(1350, L.cardBottom + 130);
+      return L;
+    };
+    const L = layout();
+    canvas.height = L.H;
+
+    // 배경
+    ctx.fillStyle = t.bg;
+    ctx.fillRect(0, 0, W, L.H);
+
+    // 상단 제목
+    ctx.fillStyle = t.fg;
+    ctx.textBaseline = "alphabetic";
+    ctx.font = `700 32px ${SANS}`;
+    ctx.textAlign = "left";
+    ctx.fillText("2026 빼빼로 운세", CX + 8, 112);
+    ctx.textAlign = "right";
+    ctx.fillText("11 · 11", W - CX - 8, 112);
+
+    // 종이 카드
+    ctx.fillStyle = "rgba(0,0,0,.18)";
+    roundRect(ctx, CX, 170 + 14, CW, L.cardBottom - 170, 48);
+    ctx.fill();
+    ctx.fillStyle = "#FFF6EA";
+    roundRect(ctx, CX, 170, CW, L.cardBottom - 170, 48);
+    ctx.fill();
+
+    // 막대 + 제목 + 점수
+    drawStick(ctx, f, IX + 8, L.headTop + 4, 40, 170);
+    ctx.textAlign = "left";
+    ctx.fillStyle = t.hl;
+    ctx.font = `700 30px ${SANS}`;
+    ctx.fillText(`${f.n} · ${f.t}`, IX + 110, L.headTop + 30);
+    ctx.fillStyle = "#3A1A12";
+    ctx.font = `${L.headSize}px ${DISPLAY}`;
+    L.headLines.forEach((ln, i) => ctx.fillText(ln, IX + 110, L.headY + 26 + i * L.headLH));
+
+    const scx = IX + IW - 80, scy = L.headTop + 80;
+    ctx.fillStyle = t.hl;
+    ctx.beginPath(); ctx.arc(scx, scy, 80, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#FFFFFF";
+    ctx.textAlign = "center";
+    ctx.font = `64px ${DISPLAY}`;
+    ctx.fillText(String(score), scx, scy + 14);
+    ctx.font = `700 24px ${SANS}`;
+    ctx.fillText("점", scx, scy + 50);
+
+    // 상세 운세
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#3A1A12";
+    ctx.font = `400 36px ${SANS}`;
+    L.detailLines.forEach((ln, i) => ctx.fillText(ln, IX, L.detailY + i * 62));
+
+    // 행운 4칸
+    const cw = (IW - 20) / 2, chh = 110;
+    lucky.forEach(([k, v], i) => {
+      const x = IX + (i % 2) * (cw + 20), y = L.gridY + Math.floor(i / 2) * (chh + 20);
+      ctx.fillStyle = "#FFFFFF";
+      roundRect(ctx, x, y, cw, chh, 24); ctx.fill();
+      ctx.strokeStyle = "#EAD9C0"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = "#6E5446";
+      ctx.font = `400 24px ${SANS}`;
+      ctx.fillText(k, x + 26, y + 42);
+      ctx.fillStyle = "#3A1A12";
+      ctx.font = `700 34px ${SANS}`;
+      ctx.fillText(v, x + 26, y + 88);
+    });
+
+    // 오늘 해 볼 한 가지
+    ctx.strokeStyle = "#C9B49A";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath(); ctx.moveTo(IX, L.dashY); ctx.lineTo(IX + IW, L.dashY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = t.hl;
+    ctx.font = `700 28px ${SANS}`;
+    ctx.fillText("오늘 해 볼 한 가지", IX, L.adviceLabelY);
+    ctx.fillStyle = "#3A1A12";
+    ctx.font = `58px ${PEN}`;
+    ctx.fillText(advice, IX, L.adviceY);
+
+    // 같이 먹으면 좋은 맛
+    ctx.fillStyle = "#F3E4CE";
+    roundRect(ctx, IX, L.matchY, IW, 88, 22); ctx.fill();
+    ctx.fillStyle = "#3A1A12";
+    ctx.font = `400 30px ${SANS}`;
+    ctx.fillText("같이 먹으면 좋은 맛", IX + 28, L.matchY + 55);
+    ctx.textAlign = "right";
+    ctx.font = `700 30px ${SANS}`;
+    ctx.fillText(match, IX + IW - 28, L.matchY + 55);
+
+    // 하단 주소
+    ctx.textAlign = "center";
+    ctx.fillStyle = t.fg;
+    ctx.font = `700 30px ${SANS}`;
+    ctx.fillText("cheetahtah.com/pepero", W / 2, L.cardBottom + (L.H - L.cardBottom) / 2 + 12);
+
+    return new Promise((res) => canvas.toBlob(res, "image/png"));
+  }
+
+  $("#saveImg").addEventListener("click", async () => {
+    const btn = $("#saveImg");
+    const label = btn.querySelector("span");
+    btn.disabled = true;
+    label.textContent = "이미지 만드는 중…";
+    try {
+      const blob = await renderResultImage();
+      const name = `2026-빼빼로운세-${state.result.f.n}.png`;
+      const file = new File([blob], name, { type: "image/png" });
+      const mobile = matchMedia("(pointer: coarse)").matches;
+      if (mobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: "2026 빼빼로 운세" }); } catch {}
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+      }
+      label.textContent = "저장했어요!";
+    } catch (e) {
+      label.textContent = "저장에 실패했어요";
+    }
+    setTimeout(() => { label.textContent = "이미지로 저장"; btn.disabled = false; }, 1600);
+  });
+
   go("intro");
 })();

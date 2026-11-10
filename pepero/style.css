@@ -84,6 +84,18 @@ body {
 .actions { margin-top: auto; display: flex; gap: 10px; }
 .actions .btn { flex: 1; height: 56px; font-size: 15px; }
 .actions .btn.wide { flex: 1.5; }
+.btn.save {
+  height: 50px;
+  border: 0;
+  background: color-mix(in srgb, var(--fg) 16%, transparent);
+  color: var(--fg);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn.save:disabled { opacity: .6; cursor: progress; }
 
 /* 빼빼로 막대 */
 .stick { display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; box-shadow: 2px 0 0 rgba(0,0,0,.22); }
