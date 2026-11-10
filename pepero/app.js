@@ -10,6 +10,38 @@
     { n: "화이트쿠키", t: "오늘의 행운", k: "luck", c: "#E8E0D2", hi: "#FFFFFF", specks: 1, box: "#EDE7DC", fg: "#2A1A0E" },
     { n: "초코쿠키", t: "연말운", k: "yearend", c: "#3E2418", hi: "#6A4532", dots: "#1F0F08", box: "#2453A6", fg: "#FFFFFF" },
   ];
+  // 특별 상자: 랜덤 뽑기에는 포함되지 않음
+  const DALBI = {
+    n: "달비🌙", file: "달비", t: "모든 행운", k: "dalbi", special: 1,
+    c: "#6B3420", hi: "#9A5A3A",
+    box: "linear-gradient(120deg,#CDEBFB 0%,#FFFFFF 42%,#FFDCE6 72%,#FFF0B8 100%)", fg: "#2E4A6E",
+    head: "남은 50일, 좋은 일만 가득하길",
+    headLines: ["남은 50일,", "좋은 일만 가득하길"],
+    letter: [
+      "안녕 다진아",
+      "",
+      "빼빼로 데이가 별다른 날이 아닐 수 있지만",
+      "먼 브라질에서 빼빼로를 받기 어려울 너에게",
+      "잠시나마 기분 좋은 순간을 만들어 주고 싶어서",
+      "이렇게 특별한 빼빼로를 준비해봤어",
+      "",
+      "아마 올해 많은 일들이 있었던 너에게",
+      "남은 50일 동안 좋은 일들이 가득했으면 좋겠다는 마음을 담아봤어",
+      "",
+      "어쩌다 우연히 알게 되었는데",
+      "같은 INFJ에 같은 생일",
+      "비슷한 점이 많으면서도 다른 점이 많은 우리",
+      "참 재미있는 인연인거 같아",
+      "",
+      "처음에 이렇게 따로 연락할 수 있을까 생각했었는데",
+      "최근에 많은 이야기를 나누고",
+      "너에 대해서 알아가고 이해해가는 과정이",
+      "즐겁고 시간가는 줄 모르는거 같아.",
+      "",
+      "앞으로도 지금처럼 재밌게 놀고 지냈으면 좋겠다",
+      "잘 부탁할게",
+    ].join("\n"),
+  };
   const COLORS = ["빨강", "버건디", "골드", "하늘색", "크림색", "초록", "보라", "코랄", "네이비", "민트", "라벤더", "오렌지"];
   const TIMES = ["오전 7시", "오전 9시", "오전 11시", "점심 12시", "오후 2시", "오후 3시", "오후 5시", "저녁 7시", "저녁 8시", "밤 10시"];
   const ITEMS = ["손편지", "이어폰", "포스트잇", "텀블러", "동전 지갑", "향수", "머리끈", "볼펜", "우산", "목도리", "핸드크림", "빼빼로"];
@@ -26,6 +58,7 @@
     luck:    { bg: "#EDE7DC", fg: "#2A1A0E", hl: "#6B4A2E" },
     yearend: { bg: "#2453A6", fg: "#FFFFFF", hl: "#2453A6" },
     random:  { bg: "#2A2A2A", fg: "#FFFFFF", hl: "#2A2A2A" },
+    dalbi:   { bg: "#BFE4F8", fg: "#2E4A6E", hl: "#E8799B" },
   };
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   function setTheme(key) {
@@ -35,6 +68,7 @@
     root.setProperty("--fg", t.fg);
     root.setProperty("--hl", t.hl);
     if (themeMeta) themeMeta.content = t.bg;
+    document.body.classList.toggle("dalbi", key === "dalbi");
   }
   const STEPS = ["intro", "pick", "draw", "detail"];
 
@@ -80,7 +114,16 @@
     ...F.map((f) => ({ n: f.n, t: f.t, box: f.box, fg: f.fg, tip: f.core ? "#E2BC7E" : f.c })),
     { n: "랜덤", t: "어떤 운이 나올까", box: "#2A2A2A", fg: "#FFFFFF", tip: "#8A8A8A" },
   ];
-  $("#packs").innerHTML = packList.map(
+  const dalbiSticks = [44, 52, 48, 56, 46, 54, 50, 58, 47]
+    .map((h) => `<i style="height:${h}px"></i>`).join("");
+  const dalbiPack = `<button type="button" class="pack pack-dalbi" data-i="dalbi" aria-pressed="false">
+      <div class="pack-box" style="background:${DALBI.box};color:${DALBI.fg}">
+        <div class="dalbi-sticks">${dalbiSticks}</div>
+        <span class="pack-name">${DALBI.n}</span>
+        <span class="pack-type">${DALBI.t}</span>
+      </div>
+    </button>`;
+  $("#packs").innerHTML = dalbiPack + packList.map(
     (p, i) => `<button type="button" class="pack" data-i="${i}" aria-pressed="false">
       <div class="pack-box" style="background:${p.box};color:${p.fg}">
         <div class="pack-tips"><i style="background:${p.tip}"></i><i style="background:${p.tip}"></i><i style="background:${p.tip}"></i></div>
@@ -93,22 +136,41 @@
   $("#packs").addEventListener("click", (e) => {
     const b = e.target.closest(".pack");
     if (!b) return;
-    state.sel = +b.dataset.i;
-    setTheme(state.sel === RANDOM ? "random" : F[state.sel].k);
+    state.sel = b.dataset.i === "dalbi" ? "dalbi" : +b.dataset.i;
+    setTheme(state.sel === "dalbi" ? "dalbi" : state.sel === RANDOM ? "random" : F[state.sel].k);
     renderPacks();
   });
 
   function renderPacks() {
-    document.querySelectorAll(".pack").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.i === state.sel)));
+    document.querySelectorAll(".pack").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.i === String(state.sel))));
     const btn = $("#draw");
     const has = state.sel !== null;
     btn.disabled = !has;
-    btn.textContent = !has ? "상자를 먼저 골라 주세요" : state.sel === RANDOM ? "랜덤 상자 열기" : `${F[state.sel].n} 상자 열기`;
+    btn.textContent = !has ? "상자를 먼저 골라 주세요"
+      : state.sel === "dalbi" ? "빼빼로 상자 열기"
+      : state.sel === RANDOM ? "랜덤 상자 열기" : `${F[state.sel].n} 상자 열기`;
   }
 
   // ---------- 3. 뽑기 ----------
   $("#draw").addEventListener("click", () => {
     if (state.sel === null) return;
+    if (state.sel === "dalbi") {
+      setTheme("dalbi");
+      state.result = {
+        f: DALBI,
+        score: 100,
+        head: DALBI.head,
+        detail: DALBI.letter,
+        lucky: [
+          ["행운의 색", "하늘색"],
+          ["행운의 숫자", "50"],
+          ["행운의 시간", TIMES[r(TIMES.length)]],
+          ["행운의 물건", "빼빼로"],
+        ],
+      };
+      renderDraw();
+      return;
+    }
     const pick = state.sel === RANDOM ? r(F.length) : state.sel;
     const f = F[pick];
     setTheme(f.k);
@@ -150,7 +212,7 @@
     clearTimeout(pullTimer);
     pullTimer = setTimeout(() => {
       sec.classList.add("pulled");
-      $("#drawTitle").textContent = "쏙! 뽑았어요";
+      $("#drawTitle").textContent = f.special ? "빼빼로를 받았어요" : "쏙! 뽑았어요";
     }, 400);
   }
 
@@ -167,12 +229,21 @@
     const { f, score, head, detail, advice, match, lucky } = state.result;
     $("#miniStick .coat").style.background = coat(f);
     $("#detailMeta").textContent = `${f.n} · ${f.t}`;
-    $("#detailHead").textContent = head;
+    if (f.headLines) $("#detailHead").innerHTML = f.headLines.join("<br>");
+    else $("#detailHead").textContent = head;
     $("#detailScore").textContent = score;
-    $("#detailText").textContent = detail;
+    const sp = !!f.special;
+    $("#detailText").hidden = sp;
+    $(".step.detail .advice").hidden = sp;
+    $(".step.detail .match").hidden = sp;
+    $("#letter").hidden = !sp;
+    if (sp) $("#letterText").textContent = detail;
+    else {
+      $("#detailText").textContent = detail;
+      $("#advice").textContent = advice;
+      $("#match").textContent = match;
+    }
     $("#lucky").innerHTML = lucky.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
-    $("#advice").textContent = advice;
-    $("#match").textContent = match;
     go("detail");
   });
 
@@ -186,7 +257,9 @@
     const btn = $("#share");
     const url = location.origin + location.pathname;
     const { f, head } = state.result;
-    const text = `내 빼빼로 운세는 ${f.n} · ${f.t}! "${head}" 너도 하나 뽑아 봐 🍫`;
+    const text = f.special
+      ? `${f.n} 빼빼로를 받았어요! ${f.t} 100점 🍫`
+      : `내 빼빼로 운세는 ${f.n} · ${f.t}! "${head}" 너도 하나 뽑아 봐 🍫`;
     if (navigator.share) {
       try { await navigator.share({ title: "2026 빼빼로 운세", text, url }); } catch {}
       return;
@@ -265,12 +338,15 @@
   async function renderResultImage() {
     const { f, score, head, detail, advice, match, lucky } = state.result;
     const t = THEMES[f.k] || THEMES.default;
-    const sample = head + detail + advice + match + lucky.flat().join("") + "2026빼빼로운세같이먹으면좋은맛오늘해볼한가지점·cheetahtah.com/pepero";
+    const sp = !!f.special;
+    const INK = sp ? "#3B3550" : "#3A1A12";
+    const LETTER_FONT = `46px ${PEN}`, LETTER_LH = 66, PARA_GAP = 30;
+    const sample = head + detail + (advice || "") + (match || "") + lucky.flat().join("") + "2026빼빼로운세같이먹으면좋은맛오늘해볼한가지점·cheetahtah.com/pepero";
     await Promise.all([
       document.fonts.load(`64px ${DISPLAY}`, sample),
       document.fonts.load(`400 36px ${SANS}`, sample),
       document.fonts.load(`700 36px ${SANS}`, sample),
-      document.fonts.load(`58px ${PEN}`, advice),
+      document.fonts.load(`58px ${PEN}`, sp ? detail + "빼빼로에 담은 편지" : advice),
     ]).catch(() => {});
 
     const W = 1080, CX = 60, CW = W - CX * 2, P = 64, IX = CX + P, IW = CW - P * 2;
@@ -304,9 +380,30 @@
         }
         if (best) L.headLines = best.lines;
       }
+      if (f.headLines) L.headLines = f.headLines;
       L.headY = y + 76;
       const headBottom = L.headY + 26 + (L.headLines.length - 1) * L.headLH + 18;
       y = Math.max(y + 190, headBottom + 44);
+      if (sp) {
+        // 편지: 줄바꿈 유지, 빈 줄은 문단 간격
+        ctx.font = LETTER_FONT;
+        L.letterTop = y;
+        let ly = y + 40 + 40 + 28; // 상자 안 여백 + 라벨
+        L.letterLabelY = y + 40 + 28;
+        L.letterLines = [];
+        ly += 34;
+        for (const para of detail.split("\n")) {
+          if (!para.trim()) { ly += PARA_GAP; continue; }
+          for (const ln of wrap(ctx, para, IW - 80)) { L.letterLines.push([ln, ly]); ly += LETTER_LH; }
+        }
+        L.letterBottom = ly - LETTER_LH + 44;
+        y = L.letterBottom + 40;
+        L.gridY = y;
+        y += 110 * 2 + 20;
+        L.cardBottom = y + P;
+        L.H = Math.max(1350, L.cardBottom + 130);
+        return L;
+      }
       ctx.font = `400 36px ${SANS}`;
       L.detailLines = wrap(ctx, detail, IW);
       L.detailY = y + 36;
@@ -327,7 +424,12 @@
     canvas.height = L.H;
 
     // 배경
-    ctx.fillStyle = t.bg;
+    if (sp) {
+      const g = ctx.createLinearGradient(0, 0, W * 0.5, L.H);
+      g.addColorStop(0, "#C4E6FA"); g.addColorStop(0.42, "#F4FAFF");
+      g.addColorStop(0.72, "#FFDCE6"); g.addColorStop(1, "#FFEFB3");
+      ctx.fillStyle = g;
+    } else ctx.fillStyle = t.bg;
     ctx.fillRect(0, 0, W, L.H);
 
     // 상단 제목
@@ -340,10 +442,10 @@
     ctx.fillText("11 · 11", W - CX - 8, 112);
 
     // 종이 카드
-    ctx.fillStyle = "rgba(0,0,0,.18)";
+    ctx.fillStyle = sp ? "rgba(70,110,160,.14)" : "rgba(0,0,0,.18)";
     roundRect(ctx, CX, 170 + 14, CW, L.cardBottom - 170, 48);
     ctx.fill();
-    ctx.fillStyle = "#FFF6EA";
+    ctx.fillStyle = sp ? "#FFFFFF" : "#FFF6EA";
     roundRect(ctx, CX, 170, CW, L.cardBottom - 170, 48);
     ctx.fill();
 
@@ -353,7 +455,7 @@
     ctx.fillStyle = t.hl;
     ctx.font = `700 30px ${SANS}`;
     ctx.fillText(`${f.n} · ${f.t}`, IX + 110, L.headTop + 30);
-    ctx.fillStyle = "#3A1A12";
+    ctx.fillStyle = INK;
     ctx.font = `${L.headSize}px ${DISPLAY}`;
     L.headLines.forEach((ln, i) => ctx.fillText(ln, IX + 110, L.headY + 26 + i * L.headLH));
 
@@ -367,26 +469,51 @@
     ctx.font = `700 24px ${SANS}`;
     ctx.fillText("점", scx, scy + 50);
 
-    // 상세 운세
     ctx.textAlign = "left";
-    ctx.fillStyle = "#3A1A12";
-    ctx.font = `400 36px ${SANS}`;
-    L.detailLines.forEach((ln, i) => ctx.fillText(ln, IX, L.detailY + i * 62));
+    if (sp) {
+      // 편지 상자 (버터색 + 분홍 줄)
+      ctx.fillStyle = "#FFF7D9";
+      roundRect(ctx, IX, L.letterTop, IW, L.letterBottom - L.letterTop, 32); ctx.fill();
+      ctx.fillStyle = t.hl;
+      ctx.font = `700 28px ${SANS}`;
+      ctx.fillText("빼빼로에 담은 편지 💌", IX + 40, L.letterLabelY);
+      ctx.strokeStyle = "rgba(232,121,155,.22)";
+      ctx.lineWidth = 2;
+      ctx.fillStyle = INK;
+      ctx.font = LETTER_FONT;
+      L.letterLines.forEach(([ln, ly]) => {
+        ctx.beginPath(); ctx.moveTo(IX + 40, ly + 14); ctx.lineTo(IX + IW - 40, ly + 14); ctx.stroke();
+        ctx.fillText(ln, IX + 40, ly);
+      });
+    } else {
+      // 상세 운세
+      ctx.fillStyle = INK;
+      ctx.font = `400 36px ${SANS}`;
+      L.detailLines.forEach((ln, i) => ctx.fillText(ln, IX, L.detailY + i * 62));
+    }
 
     // 행운 4칸
     const cw = (IW - 20) / 2, chh = 110;
     lucky.forEach(([k, v], i) => {
       const x = IX + (i % 2) * (cw + 20), y = L.gridY + Math.floor(i / 2) * (chh + 20);
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = sp ? "#EEF7FD" : "#FFFFFF";
       roundRect(ctx, x, y, cw, chh, 24); ctx.fill();
-      ctx.strokeStyle = "#EAD9C0"; ctx.lineWidth = 2; ctx.stroke();
-      ctx.fillStyle = "#6E5446";
+      ctx.strokeStyle = sp ? "#CFE6F5" : "#EAD9C0"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = sp ? "#6A7A90" : "#6E5446";
       ctx.font = `400 24px ${SANS}`;
       ctx.fillText(k, x + 26, y + 42);
-      ctx.fillStyle = "#3A1A12";
+      ctx.fillStyle = INK;
       ctx.font = `700 34px ${SANS}`;
       ctx.fillText(v, x + 26, y + 88);
     });
+
+    if (sp) {
+      ctx.textAlign = "center";
+      ctx.fillStyle = t.fg;
+      ctx.font = `700 30px ${SANS}`;
+      ctx.fillText("cheetahtah.com/pepero", W / 2, L.cardBottom + (L.H - L.cardBottom) / 2 + 12);
+      return new Promise((res) => canvas.toBlob(res, "image/png"));
+    }
 
     // 오늘 해 볼 한 가지
     ctx.strokeStyle = "#C9B49A";
@@ -427,7 +554,7 @@
     label.textContent = "이미지 만드는 중…";
     try {
       const blob = await renderResultImage();
-      const name = `2026-빼빼로운세-${state.result.f.n}.png`;
+      const name = `2026-빼빼로운세-${state.result.f.file || state.result.f.n}.png`;
       const file = new File([blob], name, { type: "image/png" });
       const mobile = matchMedia("(pointer: coarse)").matches;
       if (mobile && navigator.canShare && navigator.canShare({ files: [file] })) {
