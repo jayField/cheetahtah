@@ -11,12 +11,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=202611111000" />
+  <link rel="stylesheet" href="style.css?v=202611112000" />
 </head>
 <body>
   <div class="app">
     <header class="top">
-      <span>2026 빼빼로 운세</span>
+      <span id="topTitle">2026 빼빼로 운세</span>
       <div class="dots" id="dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     </header>
 
@@ -59,7 +59,14 @@
         <h1 class="display md" id="drawTitle">하나 꺼내는 중…</h1>
       </div>
       <div class="draw-stage" aria-hidden="true">
+        <div class="rays"></div>
         <div class="glow"></div>
+        <div class="sparkles">
+          <svg width="30" height="30" viewBox="0 0 24 24" style="left:40px;top:40px"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" class="w" style="right:50px;top:90px"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" style="right:70px;bottom:60px"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" style="left:70px;bottom:100px"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+        </div>
         <div class="big-stick stick" id="bigStick"><div class="coat"></div><div class="biscuit"></div></div>
         <div class="open-box" id="openBox">
           <div class="open-box-lid"></div>
@@ -71,6 +78,7 @@
           <span class="quick-type" id="quickType"></span>
           <span class="quick-score" id="quickScore"></span>
         </div>
+        <b class="quick-head" id="quickHead" hidden></b>
         <p id="quickLine"></p>
       </div>
       <div class="actions">
@@ -81,7 +89,7 @@
 
     <!-- 4. 상세 결과 -->
     <section class="step detail" data-step="detail" hidden>
-      <article class="card">
+      <article class="card" id="detailCard">
         <div class="card-head">
           <div class="mini-stick stick" id="miniStick"><div class="coat"></div><div class="biscuit"></div></div>
           <div class="card-title">
@@ -91,17 +99,27 @@
           <div class="score-badge"><b id="detailScore"></b><small>점</small></div>
         </div>
         <p class="detail-text" id="detailText"></p>
-        <div class="letter" id="letter" hidden>
-          <span class="label">빼빼로에 담은 편지 💌</span>
-          <p class="pen" id="letterText"></p>
-          <p class="pen sign" id="letterSign"></p>
-        </div>
         <dl class="lucky" id="lucky"></dl>
         <div class="advice">
           <span class="label">오늘 해 볼 한 가지</span>
           <span class="pen" id="advice"></span>
         </div>
         <div class="match"><span>같이 먹으면 좋은 맛</span><b id="match"></b></div>
+      </article>
+      <!-- 황금 빼빼로 (1/100) 상세 -->
+      <article class="gold-card" id="goldCard" hidden>
+        <div class="gold-inner">
+          <span class="gold-eyebrow">GOLDEN STICK · 1/100</span>
+          <div class="gold-score"><b>100</b><small>점</small></div>
+          <span class="gold-meta" id="goldMeta"></span>
+          <h2 id="goldHead"></h2>
+          <p id="goldBody"></p>
+          <dl class="lucky gold-lucky" id="goldLucky"></dl>
+          <div class="gold-advice">
+            <span>오늘 꼭 해 볼 한 가지</span>
+            <span class="pen" id="goldAdv"></span>
+          </div>
+        </div>
       </article>
       <button class="btn save" id="saveImg" type="button">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
@@ -114,7 +132,7 @@
     </section>
   </div>
 
-  <script src="fortunes.js?v=202611111000"></script>
-  <script src="app.js?v=202611111000"></script>
+  <script src="fortunes.js?v=202611112000"></script>
+  <script src="app.js?v=202611112000"></script>
 </body>
 </html>

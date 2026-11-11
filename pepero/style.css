@@ -306,74 +306,68 @@ body {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-/* ---------- 달비🌙 특별 상자 ---------- */
-.pack-dalbi { grid-column: 1 / -1; }
-.pack-dalbi .pack-box { height: 104px; box-shadow: 0 8px 0 -2px rgba(70,110,160,.22), inset 0 0 0 1.5px rgba(255,255,255,.9); }
-.pack-dalbi .pack-name { font-size: 22px; bottom: 34px; }
-.pack-dalbi .pack-type { color: #E8799B; }
-.dalbi-sticks {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  width: 150px;
-  height: 74px;
-  padding: 0 10px 8px;
-  border-radius: 8px 8px 12px 12px;
-  background: rgba(255,255,255,.75);
-  box-shadow: inset 0 -26px 0 rgba(191,228,248,.9);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  overflow: hidden;
+/* ---------- 황금 빼빼로 (1/100) ---------- */
+.rays, .sparkles { display: none; }
+body.gold .rays {
+  display: block;
+  position: absolute; left: 50%; top: 0; margin-left: -170px;
+  width: 340px; height: 340px; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255,214,90,.22) 0deg 8deg, transparent 8deg 22deg);
+  opacity: 0; transition: opacity .8s .5s, transform 4s;
 }
-.dalbi-sticks i {
-  width: 9px;
-  border-radius: 5px 5px 2px 2px;
-  background: linear-gradient(180deg, #6B3420 0 62%, #E3BE85 62%);
-  box-shadow: inset 2px 0 0 rgba(255,255,255,.18);
+body.gold .pulled .rays { opacity: 1; transform: rotate(20deg); }
+body.gold .sparkles { display: block; position: absolute; inset: 0; opacity: 0; transition: opacity .6s .9s; }
+body.gold .pulled .sparkles { opacity: 1; }
+body.gold .sparkles svg { position: absolute; fill: none; stroke: #FFE48A; stroke-width: 2; stroke-linecap: round; }
+body.gold .sparkles svg.w { stroke: #FFFFFF; }
+body.gold .glow { top: 60px; margin-left: -110px; width: 220px; height: 220px; background: radial-gradient(rgba(255,214,90,.45), rgba(255,214,90,0) 70%); }
+body.gold .open-box { display: none; }
+body.gold .big-stick {
+  width: 34px; height: 330px; margin-left: -17px; bottom: 30px; border-radius: 17px 17px 4px 4px;
+  box-shadow: 0 0 30px rgba(255,214,90,.7);
+  transform: translateY(140px); transition: transform 1.3s cubic-bezier(.2,.9,.3,1.25);
 }
+body.gold .big-stick .biscuit { height: 80px; }
+body.gold .pulled .big-stick { transform: translateY(-10px) rotate(-10deg); }
+body.gold .step.draw .head { gap: 8px; align-items: flex-start; text-shadow: none; }
+body.gold #drawBoxName { font-size: 12px; color: #1B1206; background: #F4C542; padding: 5px 12px; border-radius: 14px; letter-spacing: 1px; }
+body.gold #drawTitle { font-size: 40px; color: #FFE48A; }
+body.gold .quick { background: #FFF6DA; color: #3A2A06; border: 2px solid #E2B33C; transition: opacity .5s 1s, transform .5s 1s; }
+body.gold .quick-row { align-items: center; }
+body.gold .quick-type { font-family: "Noto Sans KR", sans-serif; font-size: 13px; font-weight: 700; color: #9A6B00; }
+body.gold .quick-score { font-size: 26px; color: #B8860B; }
+.quick-head { font-family: "Black Han Sans", sans-serif; font-weight: 400; font-size: 22px; line-height: 1.25; }
+body.gold .quick p { font-size: 14px; }
+body.gold .btn.ghost { border-color: #F4C542; color: #FFE48A; }
+body.gold .btn.solid { background: #F4C542; color: #1B1206; }
+body.gold .btn.save { background: rgba(244,197,66,.16); color: #FFE48A; }
 
-body.dalbi { background: linear-gradient(165deg, #C4E6FA 0%, #F4FAFF 42%, #FFDCE6 72%, #FFEFB3 100%) fixed; }
-body.dalbi .open-box { background: linear-gradient(120deg, #CDEBFB, #FFFFFF 45%, #FFDCE6) !important; box-shadow: 0 0 0 3px #fff, 0 16px 0 -6px rgba(70,110,160,.25); }
-body.dalbi .open-box-lid { background: rgba(232,121,155,.3); }
-body.dalbi .step.draw .head { text-shadow: 0 0 3px #fff, 0 0 8px #fff, 0 0 14px #fff; }
-body.dalbi .pulled .big-stick { transform: translateY(-34px) rotate(8deg); }
-body.dalbi .glow { background: rgba(255,255,255,.7); }
-body.dalbi .btn.solid { color: #fff; }
-body.dalbi .btn.save { background: rgba(255,255,255,.7); }
-body.dalbi .quick,
-body.dalbi .card { --paper: #FFFFFF; --ink: #3B3550; box-shadow: 0 10px 30px -14px rgba(70,110,160,.35); }
-body.dalbi .quick-row { color: #E8799B; }
-body.dalbi .lucky div { background: #EEF7FD; border-color: #CFE6F5; }
-body.dalbi .lucky dt { color: #6A7A90; }
-
-.letter {
-  background: linear-gradient(rgba(255,247,217,.7), rgba(255,247,217,.7)), url("dalbi-bg.jpg") center / cover, #FFF7D9;
-  border-radius: 16px;
-  padding: 14px 14px 16px;
-  margin: 0 -4px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.gold-card {
+  flex: 1;
+  background: #FFF6DA; color: #3A2A06;
+  border-radius: 20px; padding: 8px;
+  box-shadow: 0 0 40px rgba(244,197,66,.35);
 }
-.letter .label { font-size: 12px; color: var(--hl); }
-.letter .pen {
-  margin: 0;
-  font-size: 20px;
-  line-height: 30px;
-  letter-spacing: -.3px;
-  white-space: pre-line;
-  word-break: keep-all;
-  background: repeating-linear-gradient(180deg, transparent 0 29px, rgba(232,121,155,.22) 29px 30px);
+.gold-inner {
+  border: 2px solid #E2B33C; border-radius: 14px;
+  padding: 20px 18px; min-height: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
 }
-
-@media (min-width: 600px) {
-  body.dalbi { background: linear-gradient(165deg, #9FCDEB, #E6C3D0 70%, #E9D59A) fixed; }
-  body.dalbi .app { background: linear-gradient(165deg, #C4E6FA 0%, #F4FAFF 42%, #FFDCE6 72%, #FFEFB3 100%); }
+.gold-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #9A6B00; }
+.gold-score {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: linear-gradient(135deg, #B8860B, #FFE9A3 50%, #D4A017);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 4px #FFF6DA, 0 0 0 6px #E2B33C;
 }
-
-.score-badge.inline { width: 70px; height: 70px; border-radius: 35px; flex-direction: row; align-items: center; gap: 1px; }
-.score-badge.inline b { font-size: 23px; }
-.score-badge.inline small { font-size: 12px; padding-top: 5px; }
-body.dalbi .card-title h2 { font-size: 23px; }
-.letter .pen.sign { text-align: right; margin-top: 6px; background: none; }
+.gold-score b { font-family: "Black Han Sans", sans-serif; font-weight: 400; font-size: 28px; line-height: 1; }
+.gold-score small { font-size: 10px; font-weight: 700; }
+.gold-meta { font-size: 13px; font-weight: 700; color: #9A6B00; margin-bottom: -6px; }
+.gold-card h2 { margin: 0; font-family: "Black Han Sans", sans-serif; font-weight: 400; font-size: 26px; line-height: 1.2; word-break: keep-all; }
+.gold-card p { margin: 0; font-size: 14px; line-height: 1.75; word-break: keep-all; }
+.gold-lucky { width: 100%; text-align: left; }
+.gold-lucky div { border-color: #E8CF8A; }
+.gold-lucky dt { color: #7A5A12; }
+.gold-advice { width: 100%; border-top: 1px dashed #D9B861; padding-top: 12px; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.gold-advice > span:first-child { font-size: 12px; font-weight: 700; color: #9A6B00; }
+.gold-advice .pen { font-size: 26px; word-break: keep-all; }
