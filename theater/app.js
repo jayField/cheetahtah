@@ -14,12 +14,12 @@
 
   const HOME_ROWS = [
     { name: "우리의 인생작", pick: (w) => has(w, "best"), to: "best" },
-    { name: "최근 관람작", pick: (w) => has(w, "watched") && !has(w, "best"), to: "watched" },
+    { name: "최근 관람작", pick: (w) => has(w, "watched"), to: "watched" },
     { name: "관람 예정작", pick: (w) => has(w, "want"), to: "want" },
     { name: "관심작", pick: (w) => has(w, "like"), to: "like" },
   ];
   const VIEWS = {
-    watched: { name: "관람작", pick: (w) => has(w, "watched") || has(w, "best") },
+    watched: { name: "관람작", pick: (w) => has(w, "watched") },
     best: { name: "인생작", pick: (w) => has(w, "best") },
     want: { name: "관람 예정작", pick: (w) => has(w, "want") },
     like: { name: "관심작", pick: (w) => has(w, "like") && (!state.fan || fansOf(w).includes(state.fan)) },
@@ -58,6 +58,18 @@
     store.set(WORKS_KEY, works);
   }
   const saveWorks = () => store.set(WORKS_KEY, works);
+
+  // 예전엔 새 작품에 관람작이 자동 체크돼 있었음:
+  // 관람 예정작·관심작에 있고 별점이 없는 작품은 관람작에서 뺌 (한 번만)
+  if (!store.get("theater:fix:watched", false)) {
+    works.forEach((w) => {
+      if (has(w, "watched") && (has(w, "want") || has(w, "like")) && !w.me && !w.you) {
+        w.lists = w.lists.filter((l) => l !== "watched");
+      }
+    });
+    saveWorks();
+    store.set("theater:fix:watched", true);
+  }
 
   // 이름: 나 → 재현, 너 → 다진 (예전에 저장된 문구도 바꿈)
   const ME = "재현", YOU = "다진";
@@ -296,7 +308,7 @@
     if (!b) return;
     const r = found[+b.dataset.i];
     const existing = works.find((w) => w.tmdb && w.tmdb.id === r.tmdb.id && w.tmdb.type === r.tmdb.type);
-    openEdit(existing || { ...r, lists: ["watched"], me: "", you: "", memo: "" }, !existing);
+    openEdit(existing || { ...r, lists: [], me: "", you: "", memo: "" }, !existing);
   });
   $("#eBack").addEventListener("click", () => showPane("search"));
 
