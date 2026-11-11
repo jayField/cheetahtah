@@ -274,3 +274,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .seg legend small { font-size: 12px; color: #6E7280; margin-left: 4px; }
 .warn { margin: -8px 0 0; font-size: 13px; color: #F07A8A; }
+.fan { font-size: 11px; color: #F07A8A; font-weight: 700; }
+.fan-filter { display: flex; gap: 8px; flex-wrap: wrap; margin: 2px 0 4px; }
+.row > .empty { margin: 4px 0 0; }
+.seg.fans { margin-top: -6px; padding-left: 12px; border-left: 2px solid var(--line); }

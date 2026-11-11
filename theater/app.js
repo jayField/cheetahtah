@@ -8,18 +8,26 @@
   const KIND_COLOR = { 영화: "#F2B544", 드라마: "#7FD1B9", 애니: "#F07A8A" };
   const KINDS = ["전체", "영화", "드라마", "애니"];
 
-  // 작품 하나가 여러 목록(관람작·인생작·관람 예정작)에 동시에 들어갈 수 있음
+  // 작품 하나가 여러 목록(관람작·인생작·관람 예정작·관심작)에 동시에 들어갈 수 있음
+  // 관심작은 각자 보고 싶은 작품: fans = ["재현", "다진"] 중 누구의 관심인지
   const has = (w, list) => (w.lists || []).includes(list);
 
   const HOME_ROWS = [
     { name: "우리의 인생작", pick: (w) => has(w, "best"), to: "best" },
     { name: "최근 관람작", pick: (w) => has(w, "watched") && !has(w, "best"), to: "watched" },
     { name: "관람 예정작", pick: (w) => has(w, "want"), to: "want" },
+    { name: "관심작", pick: (w) => has(w, "like"), to: "like" },
   ];
   const VIEWS = {
     watched: { name: "관람작", pick: (w) => has(w, "watched") || has(w, "best") },
     best: { name: "인생작", pick: (w) => has(w, "best") },
     want: { name: "관람 예정작", pick: (w) => has(w, "want") },
+    like: { name: "관심작", pick: (w) => has(w, "like") && (!state.fan || fansOf(w).includes(state.fan)) },
+  };
+  const fansOf = (w) => w.fans || [];
+  const fanLabel = (w) => {
+    const f = fansOf(w);
+    return f.length === 2 ? "둘 다 관심" : f.length ? `${f[0]} 관심` : "";
   };
 
   // ---------- 저장 (지금은 이 브라우저에만) ----------
@@ -64,7 +72,7 @@
   });
   if (renamed) saveWorks();
 
-  const state = { view: "home", kind: "전체", genre: "", q: "" };
+  const state = { view: "home", kind: "전체", genre: "", q: "", fan: "" };
 
   // 카드에 붙일 장르 태그 (종류와 겹치는 장르는 빼고 2개까지)
   const tagsOf = (w) => (w.genres || []).filter((g) =>
@@ -143,6 +151,7 @@
         <span class="poster-title">${esc(w.title)}</span>
       </div>
       <div class="item-meta">${esc(metaOf(w))}</div>
+      ${has(w, "like") && fanLabel(w) ? `<div class="fan">${esc(fanLabel(w))}</div>` : ""}
       ${tagsOf(w).length ? `<div class="tags">${[...tagsOf(w)].sort((x, y) => (y === state.genre) - (x === state.genre)).slice(0, 2).map((g) => `<span>#${esc(g)}</span>`).join("")}</div>` : ""}
     </button>`;
   };
@@ -156,12 +165,15 @@
     const html = rows
       .map((row) => {
         let items = sorted.filter((w) => row.pick(w) && match(w));
-        if (!items.length) return "";
+        const fanBar = state.view === "like"
+          ? `<div class="fan-filter">${["", ME, YOU].map((f) => `<button type="button" class="chip" data-fan="${f}" aria-pressed="${f === state.fan}">${f ? f + "의 관심" : "전체"}</button>`).join("")}</div>`
+          : "";
+        if (!items.length) return fanBar ? `<section class="row"><div class="row-head"><h2>${esc(row.name)} <small>0</small></h2></div>${fanBar}<p class="empty">아직 ${state.fan ? state.fan + "의 " : ""}관심작이 없어요.</p></section>` : "";
         const limit = state.view === "home" ? 12 : Infinity;
         const more = state.view === "home" ? `<a href="#" data-more="${row.to}">전체 보기</a>` : "";
         return `<section class="row">
           <div class="row-head"><h2>${esc(row.name)} <small>${items.length}</small></h2>${more}</div>
-          <div class="grid">${items.slice(0, limit).map(card).join("")}</div>
+          ${fanBar}<div class="grid">${items.slice(0, limit).map(card).join("")}</div>
         </section>`;
       })
       .join("");
@@ -171,6 +183,8 @@
     $("#hero").hidden = !D.watching || state.view !== "home" || !!state.q;
   }
   $("#rows").addEventListener("click", (e) => {
+    const fb = e.target.closest("button[data-fan]");
+    if (fb) { state.fan = fb.dataset.fan; renderRows(); return; }
     const a = e.target.closest("a[data-more]");
     if (a) {
       e.preventDefault();
@@ -299,6 +313,8 @@
     $("#eOverview").textContent = w.overview || "";
     $("#eOverview").hidden = !w.overview;
     form.querySelectorAll('input[name="lists"]').forEach((c) => (c.checked = (w.lists || []).includes(c.value)));
+    form.querySelectorAll('input[name="fans"]').forEach((c) => (c.checked = fansOf(w).includes(c.value)));
+    syncFans();
     $("#eWarn").hidden = true;
     form.me.value = w.me || "";
     form.you.value = w.you || "";
@@ -321,10 +337,23 @@
     }
   }
 
+  // 관심작을 고르면 누구의 관심인지 고르는 칸이 나옴
+  function syncFans() {
+    const on = form.querySelector('input[name="lists"][value="like"]').checked;
+    $("#eFans").hidden = !on;
+    if (on && !form.querySelector('input[name="fans"]:checked')) {
+      form.querySelectorAll('input[name="fans"]').forEach((c) => (c.checked = true));
+    }
+  }
+  $("#eStatus").addEventListener("change", syncFans);
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!draft) return;
-    if (!form.querySelector('input[name="lists"]:checked')) { $("#eWarn").hidden = false; return; }
+    if (!form.querySelector('input[name="lists"]:checked')) { $("#eWarn").textContent = "하나 이상 골라 주세요."; $("#eWarn").hidden = false; return; }
+    const likeOn = form.querySelector('input[name="lists"][value="like"]').checked;
+    const fans = [...form.querySelectorAll('input[name="fans"]:checked')].map((c) => c.value);
+    if (likeOn && !fans.length) { $("#eWarn").textContent = "누구의 관심작인지 골라 주세요."; $("#eWarn").hidden = false; return; }
     const { isNew, ...w } = draft;
     Object.assign(w, {
       lists: [...form.querySelectorAll('input[name="lists"]:checked')].map((c) => c.value),
@@ -332,6 +361,7 @@
       you: form.you.value,
       memo: form.memo.value.trim(),
     });
+    if (likeOn) w.fans = fans; else delete w.fans;
     delete w.meta; // 예시 문구 대신 별점/메모로 표시
     if (isNew) {
       w.id = uid();
