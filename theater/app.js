@@ -67,7 +67,27 @@
     works = works.filter((w) => !String(w.id).startsWith("seed"));
     store.set(WORKS_KEY, works);
   }
-  const saveWorks = () => store.set(WORKS_KEY, works);
+  // 저장: 이 브라우저에 한 번, 공유 저장소(Firestore)에는 바뀐 작품만
+  let remote = null; // 공유 저장소에 있는 작품 (id → JSON), 연결 전엔 null
+  const syncFail = (e) => { console.warn(e); showSync("저장하지 못했어요. 잠시 후 다시 해 보세요."); };
+  const saveWorks = () => {
+    store.set(WORKS_KEY, works);
+    if (!remote || !window.TheaterDB) return;
+    const ids = new Set();
+    works.forEach((w) => {
+      const id = String(w.id);
+      ids.add(id);
+      const j = JSON.stringify(w);
+      if (remote.get(id) !== j) { remote.set(id, j); window.TheaterDB.save(w).catch(syncFail); }
+    });
+    [...remote.keys()].forEach((id) => {
+      if (!ids.has(id)) { remote.delete(id); window.TheaterDB.remove(id).catch(syncFail); }
+    });
+  };
+  function showSync(msg) {
+    const el = document.getElementById("sync");
+    if (el) { el.textContent = msg; el.hidden = !msg; }
+  }
 
   // 예전엔 새 작품에 관람작이 자동 체크돼 있었음:
   // 관람 예정작·관심작에 있고 별점이 없는 작품은 관람작에서 뺌 (한 번만)
@@ -461,7 +481,32 @@
     }
   }
 
+  // ---------- 공유 저장소 연결 ----------
+  // 처음 연결할 때 이 브라우저에만 있던 작품은 공유 저장소로 옮김 (기기마다 한 번)
+  function connect() {
+    window.TheaterDB.subscribe((list) => {
+      const first = !remote;
+      remote = new Map(list.map((w) => [String(w.id), JSON.stringify(w)]));
+      showSync("");
+      if (first && !store.get("theater:uploaded", false)) {
+        const local = works.filter((w) => !remote.has(String(w.id)));
+        works = [...list, ...local];
+        store.set("theater:uploaded", true);
+        saveWorks();
+      } else {
+        works = list;
+        store.set(WORKS_KEY, works);
+      }
+      renderAll();
+      if (first) fillPosters();
+    }, (e) => {
+      console.warn(e);
+      showSync("같이 보는 목록에 연결하지 못했어요. 지금은 이 기기에 저장된 목록만 보여요.");
+    });
+  }
+  if (window.TheaterDB) connect();
+  else window.addEventListener("theaterdb:ready", connect, { once: true });
+
   renderHero();
   renderAll();
-  fillPosters();
 })();

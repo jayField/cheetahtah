@@ -290,3 +290,4 @@ button { font-family: inherit; cursor: pointer; }
 .item-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fan.now { color: #7FD1B9; }
 .fan.unset { color: var(--muted); font-weight: 500; text-decoration: underline dotted; }
+.sync { margin: 0; font-size: 13px; color: #F07A8A; text-align: center; }
