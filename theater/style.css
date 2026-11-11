@@ -251,3 +251,23 @@ button { font-family: inherit; cursor: pointer; }
   .edit-poster { width: 88px; }
   .pane h2 { font-size: 24px; }
 }
+
+/* ---------- 장르 ---------- */
+.filters { display: flex; flex-direction: column; gap: 12px; margin-bottom: -12px; }
+.filters .tabs { margin-bottom: 0; }
+.genres { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.genres::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+}
+.chip:hover { color: var(--text); }
+.chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: -2px; }
+.tags span { font-size: 11px; color: #C8CAD2; background: var(--field); border-radius: 4px; padding: 2px 6px; }

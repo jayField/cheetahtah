@@ -10,13 +10,13 @@
 
   const HOME_ROWS = [
     { name: "우리의 인생작", pick: (w) => w.status === "best", to: "best" },
-    { name: "최근에 같이 본 거", pick: (w) => w.status === "watched", to: "watched" },
-    { name: "다음에 같이 볼 거", pick: (w) => w.status === "want", to: "want" },
+    { name: "최근 관람작", pick: (w) => w.status === "watched", to: "watched" },
+    { name: "상영 예정작", pick: (w) => w.status === "want", to: "want" },
   ];
   const VIEWS = {
-    watched: { name: "봤어요", pick: (w) => w.status === "best" || w.status === "watched" },
+    watched: { name: "관람작", pick: (w) => w.status === "best" || w.status === "watched" },
     best: { name: "인생작", pick: (w) => w.status === "best" },
-    want: { name: "볼 거예요", pick: (w) => w.status === "want" },
+    want: { name: "상영 예정", pick: (w) => w.status === "want" },
   };
 
   // ---------- 저장 (지금은 이 브라우저에만) ----------
@@ -48,7 +48,11 @@
   });
   if (renamed) saveWorks();
 
-  const state = { view: "home", kind: "전체", q: "" };
+  const state = { view: "home", kind: "전체", genre: "", q: "" };
+
+  // 카드에 붙일 장르 태그 (종류와 겹치는 장르는 빼고 2개까지)
+  const tagsOf = (w) => (w.genres || []).filter((g) =>
+    !(g === "애니메이션" && w.kind === "애니") && !(g === "드라마" && w.kind === "드라마"));
 
   // ---------- 별점 표시 ----------
   const star = (v) => (v ? `★${v}` : "");
@@ -67,11 +71,31 @@
       (k) => `<button class="tab" role="tab" type="button" data-kind="${k}" aria-selected="${k === state.kind}">${k} <span>${count(k)}</span></button>`
     ).join("");
   }
+  function renderGenres() {
+    const pool = works.filter((w) => state.kind === "전체" || w.kind === state.kind);
+    const count = {};
+    pool.forEach((w) => tagsOf(w).forEach((g) => (count[g] = (count[g] || 0) + 1)));
+    const list = Object.keys(count).sort((a, b) => count[b] - count[a]);
+    if (state.genre && !count[state.genre]) state.genre = "";
+    $("#genres").hidden = !list.length;
+    $("#genres").innerHTML = ["", ...list].map((g) =>
+      `<button type="button" class="chip" data-genre="${esc(g)}" aria-pressed="${g === state.genre}">${g ? "#" + esc(g) : "모든 장르"}</button>`
+    ).join("");
+  }
+  $("#genres").addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (!b) return;
+    state.genre = b.dataset.genre === state.genre ? "" : b.dataset.genre;
+    renderGenres();
+    renderRows();
+  });
+
   $("#tabs").addEventListener("click", (e) => {
     const b = e.target.closest(".tab");
     if (!b) return;
     state.kind = b.dataset.kind;
     renderTabs();
+    renderGenres();
     renderRows();
   });
 
@@ -103,12 +127,14 @@
         <span class="poster-title">${esc(w.title)}</span>
       </div>
       <div class="item-meta">${esc(metaOf(w))}</div>
+      ${tagsOf(w).length ? `<div class="tags">${[...tagsOf(w)].sort((x, y) => (y === state.genre) - (x === state.genre)).slice(0, 2).map((g) => `<span>#${esc(g)}</span>`).join("")}</div>` : ""}
     </button>`;
   };
 
   function renderRows() {
     const match = (w) =>
-      (state.kind === "전체" || w.kind === state.kind) && (!state.q || w.title.toLowerCase().includes(state.q));
+      (state.kind === "전체" || w.kind === state.kind) &&
+      (!state.genre || tagsOf(w).includes(state.genre)) && (!state.q || w.title.toLowerCase().includes(state.q));
     const sorted = [...works].sort((a, b) => (b.added || 0) - (a.added || 0));
     const rows = state.view === "home" ? HOME_ROWS : [VIEWS[state.view]];
     const html = rows
@@ -139,7 +165,7 @@
     const it = e.target.closest(".item");
     if (it) openEdit(works.find((w) => w.id === it.dataset.id));
   });
-  const renderAll = () => { renderTabs(); renderRows(); };
+  const renderAll = () => { renderTabs(); renderGenres(); renderRows(); };
 
   // ---------- 지금 같이 보는 중 ----------
   const WATCH_KEY = "theater:watching";
@@ -268,7 +294,7 @@
     if (w.tmdb) {
       T.details(w.tmdb).then((d) => {
         if (!draft || draft.title !== w.title) return;
-        const bits = [d.genres.slice(0, 3).join(", "), d.episodes ? `${d.episodes}화` : d.runtime ? `${d.runtime}분` : "", d.cast.length ? d.cast.slice(0, 3).join(", ") : ""];
+        const bits = [d.genres.slice(0, 3).map((g) => "#" + g).join(" "), d.episodes ? `${d.episodes}화` : d.runtime ? `${d.runtime}분` : "", d.cast.length ? d.cast.slice(0, 3).join(", ") : ""];
         $("#eExtra").textContent = bits.filter(Boolean).join(" · ");
         if (!w.overview && d.overview) { $("#eOverview").textContent = d.overview; $("#eOverview").hidden = false; draft.overview = d.overview; }
         draft.genres = d.genres;
@@ -315,10 +341,15 @@
       try {
         const [hit] = await T.search(w.title);
         w.tmdbTried = 1;
-        if (hit) Object.assign(w, { tmdb: hit.tmdb, poster: hit.poster, year: hit.year, overview: hit.overview, original: hit.original, form: hit.form });
+        if (hit) Object.assign(w, { tmdb: hit.tmdb, poster: hit.poster, year: hit.year, overview: hit.overview, original: hit.original, form: hit.form, genres: hit.genres });
       } catch { break; }
     }
-    if (pending.length) { saveWorks(); renderRows(); }
+    // 예전에 추가돼 장르가 없는 작품은 상세 정보에서 장르를 가져옴
+    const noGenre = works.filter((w) => w.tmdb && !w.genres);
+    for (const w of noGenre) {
+      try { w.genres = (await T.details(w.tmdb)).genres; } catch { break; }
+    }
+    if (pending.length || noGenre.length) { saveWorks(); renderAll(); }
     if (!watching.posterPath) {
       try {
         const [hit] = await T.search(watching.title);
