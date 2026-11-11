@@ -14,9 +14,9 @@
 
   const HOME_ROWS = [
     { name: "관람 중", pick: (w) => has(w, "now"), to: "now" },
-    { name: "우리의 인생작", pick: (w) => has(w, "best"), to: "best" },
-    { name: "최근 관람작", pick: (w) => has(w, "recent"), to: "recent" },
     { name: "관람작", pick: (w) => has(w, "watched"), to: "watched" },
+    { name: "최근 관람작", pick: (w) => has(w, "recent"), to: "recent" },
+    { name: "우리의 인생작", pick: (w) => has(w, "best"), to: "best" },
     { name: "관심작", pick: (w) => has(w, "like"), to: "like" },
     { name: "관람 예정작", pick: (w) => has(w, "want"), to: "want" },
   ];
