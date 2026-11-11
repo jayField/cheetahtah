@@ -33,6 +33,11 @@
     works = D.works.map((w, i) => ({ id: "seed" + i, ...w, added: i }));
     store.set(WORKS_KEY, works);
   }
+  // 예전 예시 작품은 지우고 직접 추가한 작품만 남김
+  if (works.some((w) => String(w.id).startsWith("seed"))) {
+    works = works.filter((w) => !String(w.id).startsWith("seed"));
+    store.set(WORKS_KEY, works);
+  }
   const saveWorks = () => store.set(WORKS_KEY, works);
 
   // 이름: 나 → 재현, 너 → 다진 (예전에 저장된 문구도 바꿈)
@@ -152,7 +157,7 @@
     $("#rows").innerHTML = html;
     $("#empty").hidden = !!html;
     $("#empty").textContent = works.length ? "찾는 작품이 없어요." : "아직 작품이 없어요. ‘+ 작품 추가’로 시작해 보세요.";
-    $("#hero").hidden = state.view !== "home" || !!state.q;
+    $("#hero").hidden = !D.watching || state.view !== "home" || !!state.q;
   }
   $("#rows").addEventListener("click", (e) => {
     const a = e.target.closest("a[data-more]");
@@ -170,9 +175,10 @@
   // ---------- 지금 같이 보는 중 ----------
   const WATCH_KEY = "theater:watching";
   const savedW = store.get(WATCH_KEY, {});
-  const watching = { ...D.watching, ...(savedW.title === D.watching.title ? savedW : {}) };
+  const watching = D.watching ? { ...D.watching, ...(savedW.title === D.watching.title ? savedW : {}) } : null;
   function renderHero() {
     const w = watching;
+    if (!w) return;
     const pct = Math.round((w.done / w.total) * 100);
     const hp = $("#heroPoster");
     hp.style.background = w.poster;
@@ -350,7 +356,7 @@
       try { w.genres = (await T.details(w.tmdb)).genres; } catch { break; }
     }
     if (pending.length || noGenre.length) { saveWorks(); renderAll(); }
-    if (!watching.posterPath) {
+    if (watching && !watching.posterPath) {
       try {
         const [hit] = await T.search(watching.title);
         if (hit && hit.poster) { watching.posterPath = hit.poster; persistW(); renderHero(); }
