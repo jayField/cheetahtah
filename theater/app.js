@@ -117,13 +117,14 @@
 
   // ---------- 별점 표시 ----------
   const star = (v) => (v ? `★${v}` : "");
-  function metaOf(w) {
-    if (w.me || w.you) {
-      if (w.me && w.me === w.you) return `둘 다 ${star(w.me)}`;
-      return [w.me && `${ME} ${star(w.me)}`, w.you && `${YOU} ${star(w.you)}`].filter(Boolean).join(" · ");
-    }
-    return w.memo || w.meta || (w.year ? `${w.year}` : "");
+  // 별점 줄 (없으면 빈칸)
+  function rateText(w) {
+    if (!w.me && !w.you) return "";
+    if (w.me && w.me === w.you) return `둘 다 ${star(w.me)}`;
+    return [w.me && `${ME} ${star(w.me)}`, w.you && `${YOU} ${star(w.you)}`].filter(Boolean).join(" · ");
   }
+  // 연도 줄: 별점이 있어도 연도는 항상 보이게, 메모가 있으면 옆에
+  const metaOf = (w) => [w.year, w.memo || w.meta].filter(Boolean).join(" · ");
 
   // ---------- 종류 탭 ----------
   function renderTabs() {
@@ -187,7 +188,8 @@
         <span class="kind" style="color:${KIND_COLOR[w.kind] || "#fff"}">${esc(w.kind)}</span>
         <span class="poster-title">${esc(w.title)}</span>
       </div>
-      <div class="item-meta">${esc(metaOf(w))}</div>
+      ${rateText(w) ? `<div class="item-rate">${esc(rateText(w))}</div>` : ""}
+      ${metaOf(w) ? `<div class="item-meta">${esc(metaOf(w))}</div>` : ""}
       ${has(w, "like") && fanLabel(w) ? `<div class="fan">${esc(fanLabel(w))}</div>` : ""}
       ${tagsOf(w).length ? `<div class="tags">${[...tagsOf(w)].sort((x, y) => (y === state.genre) - (x === state.genre)).slice(0, 2).map((g) => `<span>#${esc(g)}</span>`).join("")}</div>` : ""}
     </button>`;
