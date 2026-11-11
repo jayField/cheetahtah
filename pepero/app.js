@@ -10,14 +10,14 @@
     { n: "화이트쿠키", t: "오늘의 행운", k: "luck", c: "#E8E0D2", hi: "#FFFFFF", specks: 1, box: "#EDE7DC", fg: "#2A1A0E" },
     { n: "초코쿠키", t: "연말운", k: "yearend", c: "#3E2418", hi: "#6A4532", dots: "#1F0F08", box: "#2453A6", fg: "#FFFFFF" },
   ];
-  // 황금 빼빼로: 일반 상자에서 1/100 확률로 나옴 (주소 끝 #gold 면 항상 나옴: 미리보기용)
+  // 황금 빼빼로: 일반 상자에서 1/111 확률로 나옴 (주소 끝 #gold 면 항상 나옴: 미리보기용)
   const GOLD = {
-    love: { head: "연애운이 활짝 열린 날", body: "오늘은 생각나는 사람에게 연락해 보세요. 무엇을 해도 마음이 닿는, 100번 중 한 번 오는 날이에요.", adv: "지금 떠오르는 그 사람에게 먼저 연락하기" },
+    love: { head: "연애운이 활짝 열린 날", body: "오늘은 생각나는 사람에게 연락해 보세요. 무엇을 해도 마음이 닿는, 111번 중 한 번 오는 날이에요.", adv: "지금 떠오르는 그 사람에게 먼저 연락하기" },
     love2: { head: "사랑이 두 배로 깊어지는 날", body: "오늘만큼은 평소보다 크게 마음을 표현해 보세요. 둘에게 오래 기억될 하루가 될 거예요.", adv: "사랑한다는 말 소리 내서 전하기" },
     money: { head: "지갑에 황금빛이 드는 날", body: "작은 응모나 뽑기에도 도전해 보세요. 뜻밖의 행운이 손에 들어올 수 있는 날이에요.", adv: "오늘 하나만 응모하거나 뽑아 보기" },
     work: { head: "하는 일마다 인정받는 날", body: "미뤄 둔 제안이나 아이디어를 오늘 꺼내 보세요. 생각보다 큰 박수를 받게 될 거예요.", adv: "아껴 둔 아이디어 하나 꺼내 말하기" },
     study: { head: "머리가 번쩍 트이는 날", body: "어렵던 문제가 술술 풀려요. 오늘 공부한 건 오래도록 내 것이 돼요.", adv: "제일 어려운 과목부터 펼쳐 보기" },
-    luck: { head: "100번 중 1번 오는 하루", body: "오늘은 무엇이든 해 볼 만한 날이에요. 망설이던 일이 있다면 지금 바로 도전해 보세요.", adv: "미뤄 둔 일 하나에 바로 도전하기" },
+    luck: { head: "111번 중 1번 오는 하루", body: "오늘은 무엇이든 해 볼 만한 날이에요. 망설이던 일이 있다면 지금 바로 도전해 보세요.", adv: "미뤄 둔 일 하나에 바로 도전하기" },
     yearend: { head: "올해 최고의 연말이 와요", body: "남은 날들이 선물처럼 채워질 거예요. 보고 싶은 사람들과 꼭 만날 약속을 잡아 보세요.", adv: "보고 싶은 사람과 연말 약속 잡기" },
   };
   const GOLD_COAT = "linear-gradient(90deg,#A8740A,#FFE9A3 38%,#F4C542 55%,#B8860B 85%)";
@@ -144,11 +144,11 @@
         ["행운의 물건", ITEMS[r(ITEMS.length)]],
       ],
     };
-    if (Math.random() < 0.01 || location.hash === "#gold") {
+    if (Math.random() < 1 / 111 || location.hash === "#gold") {
       const g = GOLD[f.k];
       Object.assign(state.result, {
         gold: true, score: 100, head: g.head, detail: g.body, advice: g.adv,
-        lucky: [["행운의 색", "황금색"], ["행운의 숫자", "100"], state.result.lucky[2], state.result.lucky[3]],
+        lucky: [["행운의 색", "황금색"], ["행운의 숫자", "111"], state.result.lucky[2], state.result.lucky[3]],
       });
       setTheme("gold");
     }
@@ -159,7 +159,7 @@
     const { f, score, head, detail, gold } = state.result;
     const sec = $(".step.draw");
     sec.classList.remove("pulled");
-    $("#drawBoxName").textContent = gold ? "1/100 확률 · 황금 빼빼로" : `${f.n} 상자`;
+    $("#drawBoxName").textContent = gold ? "1/111 확률 · 황금 빼빼로" : `${f.n} 상자`;
     $("#drawTitle").textContent = "하나 꺼내는 중…";
     $("#bigStick .coat").style.background = gold ? GOLD_COAT : coat(f);
     $("#bigStick .biscuit").style.background = gold ? GOLD_BIS : "";
@@ -228,7 +228,7 @@
     const url = location.origin + location.pathname;
     const { f, head, gold } = state.result;
     const text = gold
-      ? `1/100 확률 황금빼빼로 당첨! ${f.n} · ${f.t} 100점 ✨ "${head}" 너도 하나 뽑아 봐 🍫`
+      ? `1/111 확률 황금빼빼로 당첨! ${f.n} · ${f.t} 100점 ✨ "${head}" 너도 하나 뽑아 봐 🍫`
       : `내 빼빼로 운세는 ${f.n} · ${f.t}! "${head}" 너도 하나 뽑아 봐 🍫`;
     if (navigator.share) {
       try { await navigator.share({ title: "2026 빼빼로 운세", text, url }); } catch {}
@@ -469,7 +469,7 @@
   // 황금 빼빼로 저장 이미지: 어두운 배경 + 금색 카드
   async function renderGoldImage() {
     const { f, head, detail, advice, lucky } = state.result;
-    const sample = head + detail + advice + lucky.flat().join("") + `${f.n} · ${f.t}` + "2026.11.11빼빼로운세GOLDENSTICK1/100점오늘꼭해볼한가지cheetahtah.com/pepero";
+    const sample = head + detail + advice + lucky.flat().join("") + `${f.n} · ${f.t}` + "2026.11.11빼빼로운세GOLDENSTICK1/111점오늘꼭해볼한가지cheetahtah.com/pepero";
     await Promise.all([
       document.fonts.load(`64px ${DISPLAY}`, sample),
       document.fonts.load(`400 36px ${SANS}`, sample),
@@ -512,7 +512,7 @@
     ctx.fillStyle = "#FFE48A";
     ctx.font = `700 32px ${SANS}`;
     ctx.textAlign = "left"; ctx.fillText("2026.11.11 빼빼로 운세", CX + 8, 112);
-    ctx.textAlign = "right"; ctx.fillText("GOLDEN · 1/100", W - CX - 8, 112);
+    ctx.textAlign = "right"; ctx.fillText("GOLDEN · 1/111", W - CX - 8, 112);
 
     // 금색 카드
     ctx.save();
@@ -527,7 +527,7 @@
     ctx.fillStyle = "#9A6B00";
     ctx.font = `700 30px ${SANS}`;
     if ("letterSpacing" in ctx) ctx.letterSpacing = "8px";
-    ctx.fillText("GOLDEN STICK · 1/100", MID, eyebrowY);
+    ctx.fillText("GOLDEN STICK · 1/111", MID, eyebrowY);
     if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
 
     // 100점 원
