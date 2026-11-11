@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=202611111100" />
+  <link rel="stylesheet" href="style.css?v=202611111200" />
 </head>
 <body>
   <div class="wrap">
@@ -27,6 +27,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
         <input id="q" type="search" placeholder="작품 검색" aria-label="작품 검색" />
       </label>
+      <button class="btn accent add-btn" id="openAdd" type="button">+ 작품 추가</button>
     </header>
 
     <div class="tabs" role="tablist" aria-label="작품 종류" id="tabs"></div>
@@ -51,9 +52,65 @@
 
     <div id="rows"></div>
     <p class="empty" id="empty" hidden>찾는 작품이 없어요.</p>
+
+    <footer class="foot">
+      <a class="tmdb" href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>
+      <span>작품 정보와 포스터는 TMDB에서 가져와요. This product uses the TMDB API but is not endorsed or certified by TMDB.</span>
+    </footer>
   </div>
 
-  <script src="data.js?v=202611111100"></script>
-  <script src="app.js?v=202611111100"></script>
+  <!-- 작품 추가 / 상세 -->
+  <dialog class="modal" id="modal">
+    <div class="modal-inner">
+      <button class="close" id="closeModal" type="button" aria-label="닫기">×</button>
+
+      <!-- 1) 검색 -->
+      <div class="pane" id="searchPane">
+        <h2>작품 추가</h2>
+        <label class="search big">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input id="tq" type="search" placeholder="영화·드라마·애니 제목" aria-label="TMDB에서 작품 검색" autocomplete="off" />
+        </label>
+        <p class="hint" id="searchHint">제목을 입력하면 TMDB에서 찾아요.</p>
+        <ul class="results" id="results"></ul>
+      </div>
+
+      <!-- 2) 저장 폼 -->
+      <form class="pane" id="editPane" hidden>
+        <div class="edit-top">
+          <div class="edit-poster" id="ePoster"></div>
+          <div class="edit-info">
+            <span class="kind" id="eKind"></span>
+            <h2 id="eTitle"></h2>
+            <div class="edit-sub" id="eSub"></div>
+            <div class="edit-sub" id="eExtra"></div>
+          </div>
+        </div>
+        <p class="overview" id="eOverview"></p>
+
+        <fieldset class="seg" id="eStatus">
+          <legend>어디에 둘까요</legend>
+          <label><input type="radio" name="status" value="watched" checked /><span>봤어요</span></label>
+          <label><input type="radio" name="status" value="best" /><span>인생작</span></label>
+          <label><input type="radio" name="status" value="want" /><span>볼 거예요</span></label>
+        </fieldset>
+        <div class="rates" id="eRates">
+          <label>나의 별점 <select name="me"></select></label>
+          <label>너의 별점 <select name="you"></select></label>
+        </div>
+        <label class="memo">한줄 메모 <input name="memo" maxlength="60" placeholder="예: 너의 추천, 둘 다 찜" /></label>
+
+        <div class="edit-actions">
+          <button class="btn dim" id="eBack" type="button">다시 검색</button>
+          <button class="btn danger" id="eDelete" type="button" hidden>삭제</button>
+          <button class="btn accent" type="submit" id="eSave">저장</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="data.js?v=202611111200"></script>
+  <script src="tmdb.js?v=202611111200"></script>
+  <script src="app.js?v=202611111200"></script>
 </body>
 </html>
