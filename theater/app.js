@@ -199,7 +199,7 @@
       </div>
       ${rateText(w) ? `<div class="item-rate">${esc(rateText(w))}</div>` : ""}
       ${metaOf(w) ? `<div class="item-meta">${esc(metaOf(w))}</div>` : ""}
-      ${["now", "like"].filter((l) => has(w, l) && whoLabel(w, l)).map((l) => `<div class="fan${l === "now" ? " now" : ""}">${esc(whoLabel(w, l))}</div>`).join("")}
+      ${["now", "like"].filter((l) => has(w, l)).map((l) => `<div class="fan${l === "now" ? " now" : ""}${whoLabel(w, l) ? "" : " unset"}">${esc(whoLabel(w, l) || (l === "now" ? "누가 보는지 눌러서 고르기" : "누구 관심인지 눌러서 고르기"))}</div>`).join("")}
       ${tagsOf(w).length ? `<div class="tags">${[...tagsOf(w)].sort((x, y) => (y === state.genre) - (x === state.genre)).slice(0, 2).map((g) => `<span>#${esc(g)}</span>`).join("")}</div>` : ""}
     </button>`;
   };
