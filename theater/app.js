@@ -35,6 +35,19 @@
   }
   const saveWorks = () => store.set(WORKS_KEY, works);
 
+  // 이름: 나 → 재현, 너 → 다진 (예전에 저장된 문구도 바꿈)
+  const ME = "재현", YOU = "다진";
+  const rename = (t) => (t || "")
+    .replace(/(^|· )나 ★/g, `$1${ME} ★`).replace(/(^|· )너 ★/g, `$1${YOU} ★`)
+    .replace(/나의 추천/g, `${ME} 추천`).replace(/너의 추천/g, `${YOU} 추천`);
+  let renamed = false;
+  works.forEach((w) => {
+    for (const k of ["meta", "memo"]) {
+      if (w[k] && rename(w[k]) !== w[k]) { w[k] = rename(w[k]); renamed = true; }
+    }
+  });
+  if (renamed) saveWorks();
+
   const state = { view: "home", kind: "전체", q: "" };
 
   // ---------- 별점 표시 ----------
@@ -42,7 +55,7 @@
   function metaOf(w) {
     if (w.me || w.you) {
       if (w.me && w.me === w.you) return `둘 다 ${star(w.me)}`;
-      return [w.me && `나 ${star(w.me)}`, w.you && `너 ${star(w.you)}`].filter(Boolean).join(" · ");
+      return [w.me && `${ME} ${star(w.me)}`, w.you && `${YOU} ${star(w.you)}`].filter(Boolean).join(" · ");
     }
     return w.memo || w.meta || (w.year ? `${w.year}` : "");
   }
