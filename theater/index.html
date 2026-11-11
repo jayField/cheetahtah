@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=202611112600" />
+  <link rel="stylesheet" href="style.css?v=202611112700" />
 </head>
 <body>
   <div class="wrap">
@@ -113,10 +113,15 @@
           <label><input type="checkbox" name="lists" value="like" /><span>관심작</span></label>
           <label><input type="checkbox" name="lists" value="want" /><span>관람 예정작</span></label>
         </fieldset>
-        <fieldset class="seg fans" id="eFans" hidden>
+        <fieldset class="seg fans" data-who="now" hidden>
+          <legend>누가 보고 있나요</legend>
+          <label><input type="checkbox" name="who-now" value="재현" /><span>재현</span></label>
+          <label><input type="checkbox" name="who-now" value="다진" /><span>다진</span></label>
+        </fieldset>
+        <fieldset class="seg fans" data-who="like" hidden>
           <legend>누구의 관심작인가요</legend>
-          <label><input type="checkbox" name="fans" value="재현" /><span>재현</span></label>
-          <label><input type="checkbox" name="fans" value="다진" /><span>다진</span></label>
+          <label><input type="checkbox" name="who-like" value="재현" /><span>재현</span></label>
+          <label><input type="checkbox" name="who-like" value="다진" /><span>다진</span></label>
         </fieldset>
         <p class="warn" id="eWarn" hidden>하나 이상 골라 주세요.</p>
         <div class="rates" id="eRates">
@@ -134,8 +139,8 @@
     </div>
   </dialog>
 
-  <script src="data.js?v=202611112600"></script>
-  <script src="tmdb.js?v=202611112600"></script>
-  <script src="app.js?v=202611112600"></script>
+  <script src="data.js?v=202611112700"></script>
+  <script src="tmdb.js?v=202611112700"></script>
+  <script src="app.js?v=202611112700"></script>
 </body>
 </html>
