@@ -278,3 +278,10 @@ button { font-family: inherit; cursor: pointer; }
 .fan-filter { display: flex; gap: 8px; flex-wrap: wrap; margin: 2px 0 4px; }
 .row > .empty { margin: 4px 0 0; }
 .seg.fans { margin-top: -6px; padding-left: 12px; border-left: 2px solid var(--line); }
+.filter-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sort select {
+  min-height: 40px; padding: 0 34px 0 14px; border-radius: 999px;
+  background: var(--field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A9ACB6' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+  border: 1px solid var(--line); color: var(--text); font: inherit; font-size: 14px; appearance: none; -webkit-appearance: none; cursor: pointer;
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

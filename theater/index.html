@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=202611112300" />
+  <link rel="stylesheet" href="style.css?v=202611112400" />
 </head>
 <body>
   <div class="wrap">
@@ -33,7 +33,17 @@
     </header>
 
     <div class="filters">
-      <div class="tabs" role="tablist" aria-label="작품 종류" id="tabs"></div>
+      <div class="filter-top">
+        <div class="tabs" role="tablist" aria-label="작품 종류" id="tabs"></div>
+        <label class="sort">
+          <span class="sr">정렬</span>
+          <select id="sort" aria-label="정렬">
+            <option value="added">최근 추가순</option>
+            <option value="rate-desc">별점 높은순</option>
+            <option value="rate-asc">별점 낮은순</option>
+          </select>
+        </label>
+      </div>
       <div class="genres" id="genres" aria-label="장르"></div>
     </div>
 
@@ -122,8 +132,8 @@
     </div>
   </dialog>
 
-  <script src="data.js?v=202611112300"></script>
-  <script src="tmdb.js?v=202611112300"></script>
-  <script src="app.js?v=202611112300"></script>
+  <script src="data.js?v=202611112400"></script>
+  <script src="tmdb.js?v=202611112400"></script>
+  <script src="app.js?v=202611112400"></script>
 </body>
 </html>

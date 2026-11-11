@@ -86,7 +86,30 @@
   });
   if (renamed) saveWorks();
 
-  const state = { view: "home", kind: "전체", genre: "", q: "", fan: "" };
+  const state = { view: "home", kind: "전체", genre: "", q: "", fan: "", sort: store.get("theater:sort", "added") };
+
+  // ---------- 정렬: 최근 추가순 / 별점 높은순 / 별점 낮은순 ----------
+  // 별점은 재현·다진 중 남긴 사람의 평균. 별점 없는 작품은 항상 뒤로
+  const rateOf = (w) => {
+    const r = [w.me, w.you].filter(Boolean).map(Number);
+    return r.length ? r.reduce((a, b) => a + b, 0) / r.length : null;
+  };
+  function sortWorks(list) {
+    const byAdded = (a, b) => (b.added || 0) - (a.added || 0);
+    if (state.sort === "added") return list.sort(byAdded);
+    const dir = state.sort === "rate-asc" ? 1 : -1;
+    return list.sort((a, b) => {
+      const ra = rateOf(a), rb = rateOf(b);
+      if (ra === null || rb === null) return (ra === null) - (rb === null) || byAdded(a, b);
+      return (ra - rb) * dir || byAdded(a, b);
+    });
+  }
+  $("#sort").value = state.sort;
+  $("#sort").addEventListener("change", (e) => {
+    state.sort = e.target.value;
+    store.set("theater:sort", state.sort);
+    renderRows();
+  });
 
   // 카드에 붙일 장르 태그 (종류와 겹치는 장르는 빼고 2개까지)
   const tagsOf = (w) => (w.genres || []).filter((g) =>
@@ -174,7 +197,7 @@
     const match = (w) =>
       (state.kind === "전체" || w.kind === state.kind) &&
       (!state.genre || tagsOf(w).includes(state.genre)) && (!state.q || w.title.toLowerCase().includes(state.q));
-    const sorted = [...works].sort((a, b) => (b.added || 0) - (a.added || 0));
+    const sorted = sortWorks([...works]);
     const rows = state.view === "home" ? HOME_ROWS : [VIEWS[state.view]];
     const html = rows
       .map((row) => {
