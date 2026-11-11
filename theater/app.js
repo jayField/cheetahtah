@@ -8,18 +8,18 @@
   const KIND_COLOR = { 영화: "#F2B544", 드라마: "#7FD1B9", 애니: "#F07A8A" };
   const KINDS = ["전체", "영화", "드라마", "애니"];
 
-  // 작품 하나가 여러 목록(관람작·인생작·보고 싶어요)에 동시에 들어갈 수 있음
+  // 작품 하나가 여러 목록(관람작·인생작·관람 예정작)에 동시에 들어갈 수 있음
   const has = (w, list) => (w.lists || []).includes(list);
 
   const HOME_ROWS = [
     { name: "우리의 인생작", pick: (w) => has(w, "best"), to: "best" },
     { name: "최근 관람작", pick: (w) => has(w, "watched") && !has(w, "best"), to: "watched" },
-    { name: "보고 싶어요", pick: (w) => has(w, "want"), to: "want" },
+    { name: "관람 예정작", pick: (w) => has(w, "want"), to: "want" },
   ];
   const VIEWS = {
     watched: { name: "관람작", pick: (w) => has(w, "watched") || has(w, "best") },
     best: { name: "인생작", pick: (w) => has(w, "best") },
-    want: { name: "보고 싶어요", pick: (w) => has(w, "want") },
+    want: { name: "관람 예정작", pick: (w) => has(w, "want") },
   };
 
   // ---------- 저장 (지금은 이 브라우저에만) ----------
