@@ -271,3 +271,6 @@ button { font-family: inherit; cursor: pointer; }
 .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: -2px; }
 .tags span { font-size: 11px; color: #C8CAD2; background: var(--field); border-radius: 4px; padding: 2px 6px; }
+
+.seg legend small { font-size: 12px; color: #6E7280; margin-left: 4px; }
+.warn { margin: -8px 0 0; font-size: 13px; color: #F07A8A; }

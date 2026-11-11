@@ -8,15 +8,18 @@
   const KIND_COLOR = { 영화: "#F2B544", 드라마: "#7FD1B9", 애니: "#F07A8A" };
   const KINDS = ["전체", "영화", "드라마", "애니"];
 
+  // 작품 하나가 여러 목록(관람작·인생작·상영 예정)에 동시에 들어갈 수 있음
+  const has = (w, list) => (w.lists || []).includes(list);
+
   const HOME_ROWS = [
-    { name: "우리의 인생작", pick: (w) => w.status === "best", to: "best" },
-    { name: "최근 관람작", pick: (w) => w.status === "watched", to: "watched" },
-    { name: "상영 예정작", pick: (w) => w.status === "want", to: "want" },
+    { name: "우리의 인생작", pick: (w) => has(w, "best"), to: "best" },
+    { name: "최근 관람작", pick: (w) => has(w, "watched") && !has(w, "best"), to: "watched" },
+    { name: "상영 예정작", pick: (w) => has(w, "want"), to: "want" },
   ];
   const VIEWS = {
-    watched: { name: "관람작", pick: (w) => w.status === "best" || w.status === "watched" },
-    best: { name: "인생작", pick: (w) => w.status === "best" },
-    want: { name: "상영 예정", pick: (w) => w.status === "want" },
+    watched: { name: "관람작", pick: (w) => has(w, "watched") || has(w, "best") },
+    best: { name: "인생작", pick: (w) => has(w, "best") },
+    want: { name: "상영 예정", pick: (w) => has(w, "want") },
   };
 
   // ---------- 저장 (지금은 이 브라우저에만) ----------
@@ -31,6 +34,14 @@
   let works = store.get(WORKS_KEY, null);
   if (!Array.isArray(works)) {
     works = D.works.map((w, i) => ({ id: "seed" + i, ...w, added: i }));
+    store.set(WORKS_KEY, works);
+  }
+  // 예전 방식(목록 하나만)으로 저장된 작품을 여러 목록 방식으로 바꿈
+  if (works.some((w) => !Array.isArray(w.lists))) {
+    works.forEach((w) => {
+      if (!Array.isArray(w.lists)) w.lists = [w.status || "watched"];
+      delete w.status;
+    });
     store.set(WORKS_KEY, works);
   }
   // 예전 예시 작품은 지우고 직접 추가한 작품만 남김
@@ -271,7 +282,7 @@
     if (!b) return;
     const r = found[+b.dataset.i];
     const existing = works.find((w) => w.tmdb && w.tmdb.id === r.tmdb.id && w.tmdb.type === r.tmdb.type);
-    openEdit(existing || { ...r, status: "watched", me: "", you: "", memo: "" }, !existing);
+    openEdit(existing || { ...r, lists: ["watched"], me: "", you: "", memo: "" }, !existing);
   });
   $("#eBack").addEventListener("click", () => showPane("search"));
 
@@ -287,7 +298,8 @@
     $("#eExtra").textContent = "";
     $("#eOverview").textContent = w.overview || "";
     $("#eOverview").hidden = !w.overview;
-    form.status.value = w.status || "watched";
+    form.querySelectorAll('input[name="lists"]').forEach((c) => (c.checked = (w.lists || []).includes(c.value)));
+    $("#eWarn").hidden = true;
     form.me.value = w.me || "";
     form.you.value = w.you || "";
     form.memo.value = w.memo || "";
@@ -312,9 +324,10 @@
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!draft) return;
+    if (!form.querySelector('input[name="lists"]:checked')) { $("#eWarn").hidden = false; return; }
     const { isNew, ...w } = draft;
     Object.assign(w, {
-      status: form.status.value,
+      lists: [...form.querySelectorAll('input[name="lists"]:checked')].map((c) => c.value),
       me: form.me.value,
       you: form.you.value,
       memo: form.memo.value.trim(),

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=202611111500" />
+  <link rel="stylesheet" href="style.css?v=202611111600" />
 </head>
 <body>
   <div class="wrap">
@@ -92,11 +92,12 @@
         <p class="overview" id="eOverview"></p>
 
         <fieldset class="seg" id="eStatus">
-          <legend>어디에 둘까요</legend>
-          <label><input type="radio" name="status" value="watched" checked /><span>관람작</span></label>
-          <label><input type="radio" name="status" value="best" /><span>인생작</span></label>
-          <label><input type="radio" name="status" value="want" /><span>상영 예정</span></label>
+          <legend>어디에 둘까요 <small>여러 개 골라도 돼요</small></legend>
+          <label><input type="checkbox" name="lists" value="watched" /><span>관람작</span></label>
+          <label><input type="checkbox" name="lists" value="best" /><span>인생작</span></label>
+          <label><input type="checkbox" name="lists" value="want" /><span>상영 예정</span></label>
         </fieldset>
+        <p class="warn" id="eWarn" hidden>하나 이상 골라 주세요.</p>
         <div class="rates" id="eRates">
           <label>재현 별점 <select name="me"></select></label>
           <label>다진 별점 <select name="you"></select></label>
@@ -112,8 +113,8 @@
     </div>
   </dialog>
 
-  <script src="data.js?v=202611111500"></script>
-  <script src="tmdb.js?v=202611111500"></script>
-  <script src="app.js?v=202611111500"></script>
+  <script src="data.js?v=202611111600"></script>
+  <script src="tmdb.js?v=202611111600"></script>
+  <script src="app.js?v=202611111600"></script>
 </body>
 </html>
