@@ -116,18 +116,24 @@
 
   const state = { view: "home", kind: "전체", genre: "", q: "", fan: "", sort: store.get("theater:sort", "added") };
 
-  // ---------- 정렬: 최근 추가순 / 별점 높은순 / 별점 낮은순 ----------
+  // ---------- 정렬: 최근 추가순 / 별점순 / 연도순 ----------
   // 별점은 재현·다진 중 남긴 사람의 평균. 별점 없는 작품은 항상 뒤로
   const rateOf = (w) => {
     const r = [w.me, w.you].filter(Boolean).map(Number);
     return r.length ? r.reduce((a, b) => a + b, 0) / r.length : null;
   };
+  // 연도는 "2023" 같은 앞자리 숫자만 사용. 연도 없는 작품도 항상 뒤로
+  const yearOf = (w) => {
+    const y = parseInt(w.year, 10);
+    return Number.isFinite(y) ? y : null;
+  };
   function sortWorks(list) {
     const byAdded = (a, b) => (b.added || 0) - (a.added || 0);
-    if (state.sort === "added") return list.sort(byAdded);
-    const dir = state.sort === "rate-asc" ? 1 : -1;
+    if (!/^(rate|year)-(asc|desc)$/.test(state.sort)) return list.sort(byAdded);
+    const keyOf = state.sort.startsWith("year") ? yearOf : rateOf;
+    const dir = state.sort.endsWith("asc") ? 1 : -1;
     return list.sort((a, b) => {
-      const ra = rateOf(a), rb = rateOf(b);
+      const ra = keyOf(a), rb = keyOf(b);
       if (ra === null || rb === null) return (ra === null) - (rb === null) || byAdded(a, b);
       return (ra - rb) * dir || byAdded(a, b);
     });
